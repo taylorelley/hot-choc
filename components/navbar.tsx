@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
@@ -28,6 +28,8 @@ export default function Navbar() {
   const router = useRouter()
   const [user, setUser] = useState<NavbarUser | null>(null)
   const [notifications, setNotifications] = useState(3) // Mock notification count
+  const [visible, setVisible] = useState(true)
+  const lastScrollY = useRef(0)
 
   useEffect(() => {
     const currentUser = localStorage.getItem("currentUser")
@@ -36,6 +38,21 @@ export default function Navbar() {
       setUser(userData)
     }
   }, [pathname]) // Re-check user on route changes
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentY = window.scrollY
+      if (currentY > lastScrollY.current && currentY > 50) {
+        setVisible(false)
+      } else if (currentY < lastScrollY.current) {
+        setVisible(true)
+      }
+      lastScrollY.current = currentY
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   // Don't show navbar on auth pages and onboarding
   const hideNavbarRoutes = ["/auth/login", "/auth/signup", "/onboarding", "/auth/forgot-password"]
@@ -122,7 +139,9 @@ export default function Navbar() {
   return (
     <>
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-4">
+      <nav
+        className={`fixed bottom-0 left-0 right-0 z-50 px-4 pb-4 transition-transform duration-300 ${visible ? "translate-y-0" : "translate-y-full"}`}
+      >
         <div className="max-w-md mx-auto">
           <div className="bg-white/80 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-2">
             <div className="flex items-center justify-around">

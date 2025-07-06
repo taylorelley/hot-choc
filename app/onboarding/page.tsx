@@ -66,13 +66,13 @@ export default function OnboardingPage() {
       <div className="relative max-w-md mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center h-16 mb-4">
+          <div className="inline-flex items-center justify-center h-24 mb-4">
             <Image
               src="/logo.png"
               alt="HotChoc.Monster logo"
               width={1154}
               height={517}
-              className="h-16 w-auto"
+              className="h-24 w-auto"
             />
           </div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-800 to-orange-700 bg-clip-text text-transparent mb-2">

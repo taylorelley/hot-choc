@@ -95,7 +95,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex-1">
               <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-800 to-orange-700 bg-clip-text text-transparent mb-2">
-                ☕ Hot Choc Rater
+                ☕ HotChoc.Monster
               </h1>
               <p className="text-amber-700/80">Discover & rate amazing hot chocolates</p>
             </div>

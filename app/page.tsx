@@ -223,7 +223,7 @@ export default function HomePage() {
                     </div>
                     {rating.notes && (
                       <p className="text-sm text-gray-600 truncate bg-amber-50/50 px-2 py-1 rounded-lg">
-                        "{rating.notes}"
+                        {rating.notes}
                       </p>
                     )}
                   </div>

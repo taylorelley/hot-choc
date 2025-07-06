@@ -30,3 +30,14 @@ The API listens on port `3001` by default and exposes the following endpoints:
 - `GET /api/ratings/:id` – fetch a single rating
 
 This backend uses a simple JSON file for persistence. Replace it with a proper database for production.
+
+## Development
+
+Run tests and format code using:
+
+```bash
+npm install
+npm test
+npm run format
+```
+

@@ -1,9 +1,10 @@
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const fs = require('fs');
+const express = require('express')
+const cors = require('cors')
+const bodyParser = require('body-parser')
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcryptjs')
+const fs = require('fs')
+const path = require('path')
 
 const PORT = process.env.PORT || 3001;
 const SECRET = process.env.JWT_SECRET || 'changeme';
@@ -12,7 +13,7 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-const dataFile = 'data.json';
+const dataFile = process.env.DATA_FILE || path.join(__dirname, 'data.json')
 let data = { users: [], ratings: [] };
 if (fs.existsSync(dataFile)) {
   data = JSON.parse(fs.readFileSync(dataFile));
@@ -73,4 +74,8 @@ app.get('/api/ratings/:id', (req, res) => {
   res.json(rating);
 });
 
-app.listen(PORT, () => console.log(`API running on port ${PORT}`));
+if (require.main === module) {
+  app.listen(PORT, () => console.log(`API running on port ${PORT}`))
+}
+
+module.exports = app

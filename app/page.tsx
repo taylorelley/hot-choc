@@ -93,12 +93,21 @@ export default function HomePage() {
         {/* Header with Search */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-between mb-4">
-            <div className="flex-1">
+          <div className="flex-1 flex items-center gap-3">
+            <Image
+              src="/logo.png"
+              alt="HotChoc.Monster logo"
+              width={40}
+              height={40}
+              className="w-10 h-10"
+            />
+            <div>
               <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-800 to-orange-700 bg-clip-text text-transparent mb-2">
-                ☕ HotChoc.Monster
+                HotChoc.Monster
               </h1>
               <p className="text-amber-700/80">Discover & rate amazing hot chocolates</p>
             </div>
+          </div>
             <button
               onClick={() => setShowSearch(!showSearch)}
               className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"

@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Eye, EyeOff, Coffee, ArrowRight, Mail, Lock, User, Camera } from "lucide-react"
+import { Eye, EyeOff, ArrowRight, Mail, Lock, User, Camera } from "lucide-react"
 import Image from "next/image"
 
 export default function SignUpPage() {
@@ -92,8 +92,14 @@ export default function SignUpPage() {
         <div className="w-full max-w-md">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full mb-4">
-              <Coffee className="w-8 h-8 text-white" />
+            <div className="inline-flex items-center justify-center w-16 h-16 mb-4">
+              <Image
+                src="/logo.png"
+                alt="HotChoc.Monster logo"
+                width={64}
+                height={64}
+                className="w-16 h-16 rounded-full object-cover"
+              />
             </div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-800 to-orange-700 bg-clip-text text-transparent mb-2">
               Join the Community

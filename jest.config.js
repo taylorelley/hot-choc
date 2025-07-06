@@ -6,6 +6,6 @@ module.exports = {
   },
   setupFilesAfterEnv: ['@testing-library/jest-dom'],
   globals: {
-    'ts-jest': { diagnostics: false },
+    'ts-jest': { diagnostics: false, tsconfig: 'tsconfig.jest.json' },
   },
 }

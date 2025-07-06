@@ -10,6 +10,8 @@ import Image from 'next/image'
 
 export default function LoginPage() {
   const router = useRouter()
+  const API_URL =
+    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -24,7 +26,7 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const res = await fetch('http://localhost:3001/api/login', {
+      const res = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

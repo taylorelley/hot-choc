@@ -10,6 +10,8 @@ import Image from 'next/image'
 
 export default function SignUpPage() {
   const router = useRouter()
+  const API_URL =
+    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -46,7 +48,7 @@ export default function SignUpPage() {
     }
 
     try {
-      const res = await fetch('http://localhost:3001/api/register', {
+      const res = await fetch(`${API_URL}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

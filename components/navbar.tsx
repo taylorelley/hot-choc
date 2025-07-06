@@ -4,12 +4,23 @@ import { useState, useEffect } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
-import { Home, Plus, Search, User, Coffee, Bell, LogIn, UserPlus, Compass } from "lucide-react"
+import { Home, Plus, Search, User, Coffee, Bell, LogIn, UserPlus, Compass, type LucideIcon } from "lucide-react"
 
 interface NavbarUser {
   id: string
   name: string
   avatar: string
+}
+
+interface NavItem {
+  id: string
+  label: string
+  icon: LucideIcon
+  href?: string
+  onClick?: () => void
+  isActive: boolean
+  isSpecial?: boolean
+  showAvatar?: boolean
 }
 
 export default function Navbar() {
@@ -36,7 +47,7 @@ export default function Navbar() {
     router.push(`/auth/${action}`)
   }
 
-  const navItems = user
+  const navItems: NavItem[] = user
     ? [
         {
           id: "home",

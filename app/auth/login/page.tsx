@@ -1,39 +1,42 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { Eye, EyeOff, Coffee, ArrowRight, Mail, Lock } from "lucide-react"
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { Eye, EyeOff, Coffee, ArrowRight, Mail, Lock } from 'lucide-react'
 
 export default function LoginPage() {
   const router = useRouter()
   const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+    email: '',
+    password: '',
   })
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    setError("")
+    setError('')
 
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1500))
 
     // Mock authentication - in real app, this would be an API call
-    const users = JSON.parse(localStorage.getItem("hotChocUsers") || "[]")
-    const user = users.find((u: any) => u.email === formData.email && u.password === formData.password)
+    const users = JSON.parse(localStorage.getItem('hotChocUsers') || '[]')
+    const user = users.find(
+      (u: any) =>
+        u.email === formData.email && u.password === formData.password,
+    )
 
     if (user) {
-      localStorage.setItem("currentUser", JSON.stringify(user))
-      router.push("/dashboard")
+      localStorage.setItem('currentUser', JSON.stringify(user))
+      router.push('/dashboard')
     } else {
-      setError("Invalid email or password")
+      setError('Invalid email or password')
     }
 
     setIsLoading(false)
@@ -57,26 +60,34 @@ export default function LoginPage() {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-800 to-orange-700 bg-clip-text text-transparent mb-2">
               Welcome Back
             </h1>
-            <p className="text-amber-700">Sign in to continue your hot chocolate journey</p>
+            <p className="text-amber-700">
+              Sign in to continue your hot chocolate journey
+            </p>
           </div>
 
           {/* Login Form */}
           <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 border border-white/20">
             <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm">{error}</div>
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm">
+                  {error}
+                </div>
               )}
 
               {/* Email Field */}
               <div>
-                <label className="block text-sm font-medium text-amber-900 mb-2">Email Address</label>
+                <label className="block text-sm font-medium text-amber-900 mb-2">
+                  Email Address
+                </label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-amber-500" />
                   <input
                     type="email"
                     required
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
                     className="w-full pl-12 pr-4 py-4 border border-amber-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-transparent transition-all duration-300 bg-white/50 backdrop-blur-sm"
                     placeholder="Enter your email"
                   />
@@ -85,14 +96,18 @@ export default function LoginPage() {
 
               {/* Password Field */}
               <div>
-                <label className="block text-sm font-medium text-amber-900 mb-2">Password</label>
+                <label className="block text-sm font-medium text-amber-900 mb-2">
+                  Password
+                </label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-amber-500" />
                   <input
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     required
                     value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
                     className="w-full pl-12 pr-12 py-4 border border-amber-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-transparent transition-all duration-300 bg-white/50 backdrop-blur-sm"
                     placeholder="Enter your password"
                   />
@@ -101,7 +116,11 @@ export default function LoginPage() {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-4 top-1/2 transform -translate-y-1/2 text-amber-500 hover:text-amber-600 transition-colors"
                   >
-                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showPassword ? (
+                      <EyeOff className="w-5 h-5" />
+                    ) : (
+                      <Eye className="w-5 h-5" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -139,7 +158,7 @@ export default function LoginPage() {
             {/* Sign Up Link */}
             <div className="mt-8 text-center">
               <p className="text-amber-700">
-                Don't have an account?{" "}
+                Don't have an account?{' '}
                 <Link
                   href="/auth/signup"
                   className="font-semibold text-amber-600 hover:text-amber-700 transition-colors"
@@ -147,14 +166,6 @@ export default function LoginPage() {
                   Sign up here
                 </Link>
               </p>
-            </div>
-          </div>
-
-          {/* Demo Account */}
-          <div className="mt-6 text-center">
-            <div className="bg-amber-100/50 backdrop-blur-sm rounded-xl p-4 border border-amber-200/50">
-              <p className="text-sm text-amber-800 mb-2">Demo Account:</p>
-              <p className="text-xs text-amber-700">Email: demo@hotchoc.com | Password: demo123</p>
             </div>
           </div>
         </div>

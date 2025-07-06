@@ -1,8 +1,16 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import Image from "next/image"
-import { Search, Filter, Star, MapPin, Users, TrendingUp, Heart } from "lucide-react"
+import { useState, useEffect } from 'react'
+import Image from 'next/image'
+import {
+  Search,
+  Filter,
+  Star,
+  MapPin,
+  Users,
+  TrendingUp,
+  Heart,
+} from 'lucide-react'
 
 interface User {
   id: string
@@ -39,99 +47,40 @@ interface CommunityRating {
 }
 
 export default function ExplorePage() {
-  const [activeTab, setActiveTab] = useState("community")
-  const [searchQuery, setSearchQuery] = useState("")
-  const [communityRatings, setCommunityRatings] = useState<CommunityRating[]>([])
+  const [activeTab, setActiveTab] = useState('community')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [communityRatings, setCommunityRatings] = useState<CommunityRating[]>(
+    [],
+  )
   const [topUsers, setTopUsers] = useState<User[]>([])
   const [currentUser, setCurrentUser] = useState<any>(null)
 
   useEffect(() => {
-    const user = localStorage.getItem("currentUser")
+    const user = localStorage.getItem('currentUser')
     if (user) {
       setCurrentUser(JSON.parse(user))
     }
 
-    // Mock community data
-    setCommunityRatings([
-      {
-        id: "1",
-        userId: "user1",
-        userName: "Sarah Chen",
-        userAvatar: "/placeholder.svg?height=40&width=40",
-        photo: "/placeholder.svg?height=300&width=300",
-        location: { name: "Blue Bottle Coffee, SoHo" },
-        ratings: { temperature: 5, sweetness: 4, texture: 5, chocolate: 4, creaminess: 5, presentation: 5 },
-        notes:
-          "Absolutely divine! The perfect balance of rich chocolate and creamy texture. The presentation was Instagram-worthy too!",
-        timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-        likes: 24,
-        isLiked: false,
-      },
-      {
-        id: "2",
-        userId: "user2",
-        userName: "Mike Rodriguez",
-        userAvatar: "/placeholder.svg?height=40&width=40",
-        photo: "/placeholder.svg?height=300&width=300",
-        location: { name: "Café Grumpy, Chelsea" },
-        ratings: { temperature: 4, sweetness: 3, texture: 4, chocolate: 5, creaminess: 4, presentation: 3 },
-        notes:
-          "Great chocolate intensity but could use more creaminess. Still a solid choice for dark chocolate lovers.",
-        timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-        likes: 12,
-        isLiked: true,
-      },
-      {
-        id: "3",
-        userId: "user3",
-        userName: "Emma Thompson",
-        userAvatar: "/placeholder.svg?height=40&width=40",
-        photo: "/placeholder.svg?height=300&width=300",
-        location: { name: "Joe Coffee, Union Square" },
-        ratings: { temperature: 4, sweetness: 5, texture: 3, chocolate: 4, creaminess: 3, presentation: 4 },
-        notes: "Sweet and comforting, perfect for a cold day. The marshmallows were a nice touch!",
-        timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
-        likes: 18,
-        isLiked: false,
-      },
-    ])
-
-    setTopUsers([
-      {
-        id: "user1",
-        name: "Sarah Chen",
-        avatar: "/placeholder.svg?height=50&width=50",
-        stats: { totalRatings: 47, averageRating: 4.2 },
-        isFollowing: false,
-      },
-      {
-        id: "user2",
-        name: "Mike Rodriguez",
-        avatar: "/placeholder.svg?height=50&width=50",
-        stats: { totalRatings: 32, averageRating: 4.0 },
-        isFollowing: true,
-      },
-      {
-        id: "user3",
-        name: "Emma Thompson",
-        avatar: "/placeholder.svg?height=50&width=50",
-        stats: { totalRatings: 28, averageRating: 4.1 },
-        isFollowing: false,
-      },
-    ])
+    // In a real app this would fetch community data from the API
+    setCommunityRatings([])
+    setTopUsers([])
   }, [])
 
-  const getAverageRating = (ratings: CommunityRating["ratings"]) => {
+  const getAverageRating = (ratings: CommunityRating['ratings']) => {
     const values = Object.values(ratings)
-    return (values.reduce((sum, val) => sum + val, 0) / values.length).toFixed(1)
+    return (values.reduce((sum, val) => sum + val, 0) / values.length).toFixed(
+      1,
+    )
   }
 
   const formatTimeAgo = (timestamp: string) => {
     const now = new Date()
     const time = new Date(timestamp)
-    const diffInHours = Math.floor((now.getTime() - time.getTime()) / (1000 * 60 * 60))
+    const diffInHours = Math.floor(
+      (now.getTime() - time.getTime()) / (1000 * 60 * 60),
+    )
 
-    if (diffInHours < 1) return "Just now"
+    if (diffInHours < 1) return 'Just now'
     if (diffInHours < 24) return `${diffInHours}h ago`
     return `${Math.floor(diffInHours / 24)}d ago`
   }
@@ -151,7 +100,11 @@ export default function ExplorePage() {
   }
 
   const handleFollow = (userId: string) => {
-    setTopUsers((prev) => prev.map((user) => (user.id === userId ? { ...user, isFollowing: !user.isFollowing } : user)))
+    setTopUsers((prev) =>
+      prev.map((user) =>
+        user.id === userId ? { ...user, isFollowing: !user.isFollowing } : user,
+      ),
+    )
   }
 
   return (
@@ -190,22 +143,22 @@ export default function ExplorePage() {
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-2 mb-6">
           <div className="grid grid-cols-2 gap-1">
             <button
-              onClick={() => setActiveTab("community")}
+              onClick={() => setActiveTab('community')}
               className={`p-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 ${
-                activeTab === "community"
-                  ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg"
-                  : "text-amber-700 hover:bg-amber-50"
+                activeTab === 'community'
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg'
+                  : 'text-amber-700 hover:bg-amber-50'
               }`}
             >
               <TrendingUp className="w-4 h-4" />
               <span className="font-medium">Community</span>
             </button>
             <button
-              onClick={() => setActiveTab("users")}
+              onClick={() => setActiveTab('users')}
               className={`p-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 ${
-                activeTab === "users"
-                  ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg"
-                  : "text-amber-700 hover:bg-amber-50"
+                activeTab === 'users'
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg'
+                  : 'text-amber-700 hover:bg-amber-50'
               }`}
             >
               <Users className="w-4 h-4" />
@@ -215,34 +168,43 @@ export default function ExplorePage() {
         </div>
 
         {/* Tab Content */}
-        {activeTab === "community" && (
+        {activeTab === 'community' && (
           <div className="space-y-6">
             {communityRatings.map((rating) => (
-              <div key={rating.id} className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden">
+              <div
+                key={rating.id}
+                className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden"
+              >
                 {/* User Header */}
                 <div className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Image
-                      src={rating.userAvatar || "/placeholder.svg"}
+                      src={rating.userAvatar || '/placeholder.svg'}
                       alt={rating.userName}
                       width={40}
                       height={40}
                       className="w-10 h-10 rounded-full object-cover"
                     />
                     <div>
-                      <h3 className="font-semibold text-amber-900">{rating.userName}</h3>
-                      <p className="text-sm text-amber-600">{formatTimeAgo(rating.timestamp)}</p>
+                      <h3 className="font-semibold text-amber-900">
+                        {rating.userName}
+                      </h3>
+                      <p className="text-sm text-amber-600">
+                        {formatTimeAgo(rating.timestamp)}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Star className="w-4 h-4 text-amber-500 fill-current" />
-                    <span className="font-semibold text-amber-900">{getAverageRating(rating.ratings)}</span>
+                    <span className="font-semibold text-amber-900">
+                      {getAverageRating(rating.ratings)}
+                    </span>
                   </div>
                 </div>
 
                 {/* Photo */}
                 <Image
-                  src={rating.photo || "/placeholder.svg"}
+                  src={rating.photo || '/placeholder.svg'}
                   alt="Hot chocolate"
                   width={400}
                   height={300}
@@ -253,7 +215,9 @@ export default function ExplorePage() {
                 <div className="p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <MapPin className="w-4 h-4 text-amber-500" />
-                    <span className="font-medium text-amber-900">{rating.location.name}</span>
+                    <span className="font-medium text-amber-900">
+                      {rating.location.name}
+                    </span>
                   </div>
 
                   <p className="text-gray-700 mb-4">{rating.notes}</p>
@@ -262,14 +226,18 @@ export default function ExplorePage() {
                   <div className="grid grid-cols-2 gap-2 mb-4">
                     {Object.entries(rating.ratings).map(([key, value]) => (
                       <div key={key} className="flex items-center gap-2">
-                        <span className="text-xs text-amber-600 capitalize w-16">{key}</span>
+                        <span className="text-xs text-amber-600 capitalize w-16">
+                          {key}
+                        </span>
                         <div className="flex-1 h-2 bg-amber-100 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-gradient-to-r from-amber-400 to-orange-400 rounded-full transition-all duration-500"
                             style={{ width: `${(value / 5) * 100}%` }}
                           />
                         </div>
-                        <span className="text-xs text-amber-700 w-4">{value}</span>
+                        <span className="text-xs text-amber-700 w-4">
+                          {value}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -280,12 +248,16 @@ export default function ExplorePage() {
                       onClick={() => handleLike(rating.id)}
                       className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${
                         rating.isLiked
-                          ? "bg-red-50 text-red-600"
-                          : "bg-gray-50 text-gray-600 hover:bg-red-50 hover:text-red-600"
+                          ? 'bg-red-50 text-red-600'
+                          : 'bg-gray-50 text-gray-600 hover:bg-red-50 hover:text-red-600'
                       }`}
                     >
-                      <Heart className={`w-4 h-4 ${rating.isLiked ? "fill-current" : ""}`} />
-                      <span className="text-sm font-medium">{rating.likes}</span>
+                      <Heart
+                        className={`w-4 h-4 ${rating.isLiked ? 'fill-current' : ''}`}
+                      />
+                      <span className="text-sm font-medium">
+                        {rating.likes}
+                      </span>
                     </button>
                     <button className="text-amber-600 text-sm font-medium hover:text-amber-700 transition-colors">
                       View Details
@@ -297,21 +269,26 @@ export default function ExplorePage() {
           </div>
         )}
 
-        {activeTab === "users" && (
+        {activeTab === 'users' && (
           <div className="space-y-4">
             {topUsers.map((user) => (
-              <div key={user.id} className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6">
+              <div
+                key={user.id}
+                className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6"
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <Image
-                      src={user.avatar || "/placeholder.svg"}
+                      src={user.avatar || '/placeholder.svg'}
                       alt={user.name}
                       width={50}
                       height={50}
                       className="w-12 h-12 rounded-full object-cover border-2 border-amber-200"
                     />
                     <div>
-                      <h3 className="font-semibold text-amber-900">{user.name}</h3>
+                      <h3 className="font-semibold text-amber-900">
+                        {user.name}
+                      </h3>
                       <div className="flex items-center gap-4 text-sm text-amber-600">
                         <span>{user.stats.totalRatings} ratings</span>
                         <div className="flex items-center gap-1">
@@ -325,11 +302,11 @@ export default function ExplorePage() {
                     onClick={() => handleFollow(user.id)}
                     className={`px-6 py-2 rounded-full font-medium transition-all duration-300 ${
                       user.isFollowing
-                        ? "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                        : "bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 shadow-lg hover:shadow-xl"
+                        ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                        : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 shadow-lg hover:shadow-xl'
                     }`}
                   >
-                    {user.isFollowing ? "Following" : "Follow"}
+                    {user.isFollowing ? 'Following' : 'Follow'}
                   </button>
                 </div>
               </div>

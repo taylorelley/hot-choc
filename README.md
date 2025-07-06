@@ -31,6 +31,18 @@ The API listens on port `3001` by default and exposes the following endpoints:
 
 This backend uses a simple JSON file for persistence. Replace it with a proper database for production.
 
+## Running with Docker Compose
+
+You can run both the frontend and backend using Docker. Build and start the
+containers using:
+
+```bash
+docker compose up --build
+```
+
+The frontend will be available on [http://localhost:3000](http://localhost:3000)
+and the API on [http://localhost:3001](http://localhost:3001).
+
 ## Development
 
 Run tests and format code using:

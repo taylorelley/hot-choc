@@ -97,16 +97,11 @@ export default function HomePage() {
             <Image
               src="/logo.png"
               alt="HotChoc.Monster logo"
-              width={40}
-              height={40}
-              className="w-10 h-10"
+              width={1154}
+              height={517}
+              className="h-10 w-auto"
             />
-            <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-800 to-orange-700 bg-clip-text text-transparent mb-2">
-                HotChoc.Monster
-              </h1>
-              <p className="text-amber-700/80">Discover & rate amazing hot chocolates</p>
-            </div>
+            <p className="text-amber-700/80">Discover & rate amazing hot chocolates</p>
           </div>
             <button
               onClick={() => setShowSearch(!showSearch)}

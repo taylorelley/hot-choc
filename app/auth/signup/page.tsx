@@ -92,13 +92,13 @@ export default function SignUpPage() {
         <div className="w-full max-w-md">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 mb-4">
+            <div className="inline-flex items-center justify-center h-16 mb-4">
               <Image
                 src="/logo.png"
                 alt="HotChoc.Monster logo"
-                width={64}
-                height={64}
-                className="w-16 h-16 rounded-full object-cover"
+                width={1154}
+                height={517}
+                className="h-16 w-auto"
               />
             </div>
             <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-800 to-orange-700 bg-clip-text text-transparent mb-2">

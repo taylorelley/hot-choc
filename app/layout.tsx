@@ -4,12 +4,12 @@ import "./globals.css"
 import Navbar from "@/components/navbar"
 
 export const metadata: Metadata = {
-  title: "Hot Choc Rater - Rate & Discover Amazing Hot Chocolates",
+  title: "HotChoc.Monster - Rate & Discover Amazing Hot Chocolates",
   description: "Discover, rate, and share your favorite hot chocolate experiences with the community",
   keywords: "hot chocolate, rating, coffee, drinks, reviews, community",
-  authors: [{ name: "Hot Choc Rater Team" }],
+  authors: [{ name: "HotChoc.Monster Team" }],
   openGraph: {
-    title: "Hot Choc Rater",
+    title: "HotChoc.Monster",
     description: "Rate & Discover Amazing Hot Chocolates",
     type: "website",
   },

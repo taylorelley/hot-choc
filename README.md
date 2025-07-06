@@ -1,4 +1,4 @@
-# Hot Choc Rater
+# HotChoc.Monster
 
 This project contains a Next.js frontend for rating hot chocolate drinks. The original app stored all data in `localStorage`.
 

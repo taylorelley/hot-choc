@@ -69,7 +69,7 @@ export default function OnboardingPage() {
             <Coffee className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-800 to-orange-700 bg-clip-text text-transparent mb-2">
-            Welcome to Hot Choc Rater!
+            Welcome to HotChoc.Monster!
           </h1>
           <p className="text-amber-700">Let's personalize your experience</p>
         </div>

@@ -23,24 +23,33 @@ export default function LoginPage() {
     setIsLoading(true)
     setError('')
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    try {
+      const res = await fetch('http://localhost:3001/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      })
 
-    // Mock authentication - in real app, this would be an API call
-    const users = JSON.parse(localStorage.getItem('hotChocUsers') || '[]')
-    const user = users.find(
-      (u: any) =>
-        u.email === formData.email && u.password === formData.password,
-    )
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.message || 'Invalid email or password')
+      }
 
-    if (user) {
-      localStorage.setItem('currentUser', JSON.stringify(user))
+      const data = await res.json()
+      localStorage.setItem('token', data.token)
+      localStorage.setItem(
+        'currentUser',
+        JSON.stringify({ email: formData.email }),
+      )
       router.push('/dashboard')
-    } else {
-      setError('Invalid email or password')
+    } catch (err: any) {
+      setError(err.message || 'Invalid email or password')
+    } finally {
+      setIsLoading(false)
     }
-
-    setIsLoading(false)
   }
 
   return (

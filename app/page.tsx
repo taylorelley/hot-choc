@@ -93,10 +93,14 @@ export default function HomePage() {
         {/* Header with Search */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-between mb-4">
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-800 to-orange-700 bg-clip-text text-transparent mb-2">
-                ☕ HotChoc.Monster
-              </h1>
+            <div className="flex-1 text-center">
+              <Image
+                src="/logo.png"
+                alt="HotChoc.Monster logo"
+                width={1154}
+                height={517}
+                className="h-24 w-auto mx-auto mb-2"
+              />
               <p className="text-amber-700/80">Discover & rate amazing hot chocolates</p>
             </div>
             <button

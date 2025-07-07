@@ -135,14 +135,20 @@ export default function SignUpPage() {
                       <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-r from-amber-200 to-orange-200 flex items-center justify-center">
                         {formData.avatar ? (
                           <Image
-                            src={formData.avatar || '/placeholder.svg'}
+                            src={formData.avatar}
                             alt="Avatar"
                             width={96}
                             height={96}
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <User className="w-10 h-10 text-amber-600" />
+                          <span
+                            className="text-5xl"
+                            role="img"
+                            aria-label="No avatar"
+                          >
+                            👤
+                          </span>
                         )}
                       </div>
                       <button

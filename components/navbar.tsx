@@ -183,13 +183,23 @@ export default function Navbar() {
                       {/* Special handling for profile with avatar */}
                       {item.showAvatar && user ? (
                         <div className="relative mb-1">
-                          <Image
-                            src={user.avatar || "/placeholder.svg?height=24&width=24"}
-                            alt={user.name}
-                            width={24}
-                            height={24}
-                            className="w-6 h-6 rounded-full object-cover border-2 border-current"
-                          />
+                          {user.avatar ? (
+                            <Image
+                              src={user.avatar}
+                              alt={user.name}
+                              width={24}
+                              height={24}
+                              className="w-6 h-6 rounded-full object-cover border-2 border-current"
+                            />
+                          ) : (
+                            <span
+                              className="w-6 h-6 flex items-center justify-center text-xl"
+                              role="img"
+                              aria-label="No avatar"
+                            >
+                              👤
+                            </span>
+                          )}
                           {item.isActive && (
                             <div className="absolute -top-1 -right-1 w-3 h-3 bg-amber-500 rounded-full border-2 border-white"></div>
                           )}

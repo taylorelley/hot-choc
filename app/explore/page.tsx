@@ -287,13 +287,23 @@ export default function ExplorePage() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <Image
-                      src={user.avatar || '/placeholder.svg'}
-                      alt={user.name}
-                      width={50}
-                      height={50}
-                      className="w-12 h-12 rounded-full object-cover border-2 border-amber-200"
-                    />
+                    {user.avatar ? (
+                      <Image
+                        src={user.avatar}
+                        alt={user.name}
+                        width={50}
+                        height={50}
+                        className="w-12 h-12 rounded-full object-cover border-2 border-amber-200"
+                      />
+                    ) : (
+                      <span
+                        className="w-12 h-12 flex items-center justify-center text-3xl border-2 border-amber-200 rounded-full"
+                        role="img"
+                        aria-label="No avatar"
+                      >
+                        👤
+                      </span>
+                    )}
                     <div>
                       <h3 className="font-semibold text-amber-900">
                         {user.name}

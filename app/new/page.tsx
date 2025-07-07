@@ -64,6 +64,19 @@ export default function NewRatingPage() {
     })
   }
 
+  const fetchCafeName = async (lat: number, lng: number): Promise<string> => {
+    try {
+      const query = `[out:json];node(around:100,${lat},${lng})[amenity=cafe];out 1;`
+      const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`
+      const res = await fetch(url)
+      const data = await res.json()
+      return data.elements?.[0]?.tags?.name || ''
+    } catch (err) {
+      console.error('Failed to detect cafe name', err)
+      return ''
+    }
+  }
+
   const handlePhotoCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
@@ -82,11 +95,19 @@ export default function NewRatingPage() {
     setIsGettingLocation(true)
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
+          const lat = position.coords.latitude
+          const lng = position.coords.longitude
+          let cafe = ''
+          try {
+            cafe = await fetchCafeName(lat, lng)
+          } catch (err) {
+            console.error('Error fetching cafe name', err)
+          }
           setLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-            name: location.name || `${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`,
+            lat,
+            lng,
+            name: cafe || `${lat.toFixed(4)}, ${lng.toFixed(4)}`,
           })
           setIsGettingLocation(false)
           if (currentStep === 2) setCurrentStep(3)
@@ -96,6 +117,8 @@ export default function NewRatingPage() {
           setIsGettingLocation(false)
         },
       )
+    } else {
+      setIsGettingLocation(false)
     }
   }
 

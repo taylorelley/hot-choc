@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import { MapPin, Calendar, Star, Share2, Heart } from "lucide-react"
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import Link from "next/link"
 import Image from "next/image"
 
@@ -208,6 +209,21 @@ export default function RatingDetailPage() {
                     <p className="text-sm text-gray-500 mt-1">
                       {rating.location.lat.toFixed(4)}, {rating.location.lng.toFixed(4)}
                     </p>
+                  )}
+                  {rating.location.lat !== 0 && rating.location.lng !== 0 && (
+                    <div className="h-48 mt-4 rounded-xl overflow-hidden">
+                      <MapContainer
+                        center={[rating.location.lat, rating.location.lng]}
+                        zoom={16}
+                        style={{ height: '100%', width: '100%' }}
+                        scrollWheelZoom={false}
+                      >
+                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                        <Marker position={[rating.location.lat, rating.location.lng]}>
+                          <Popup>{rating.location.name}</Popup>
+                        </Marker>
+                      </MapContainer>
+                    </div>
                   )}
                 </div>
               </div>

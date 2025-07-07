@@ -67,11 +67,11 @@ export default function Navbar() {
   const navItems: NavItem[] = user
     ? [
         {
-          id: "home",
-          label: "Home",
-          icon: Home,
-          href: "/",
-          isActive: pathname === "/",
+          id: "explore",
+          label: "Explore",
+          icon: Compass,
+          href: "/explore",
+          isActive: pathname === "/explore",
         },
         {
           id: "dashboard",
@@ -89,11 +89,11 @@ export default function Navbar() {
           isSpecial: true, // This will be the main CTA button
         },
         {
-          id: "explore",
-          label: "Explore",
-          icon: Compass,
-          href: "/explore",
-          isActive: pathname === "/explore",
+          id: "home",
+          label: "Home",
+          icon: Home,
+          href: "/",
+          isActive: pathname === "/",
         },
         {
           id: "profile",
@@ -106,18 +106,18 @@ export default function Navbar() {
       ]
     : [
         {
-          id: "home",
-          label: "Home",
-          icon: Home,
-          href: "/",
-          isActive: pathname === "/",
-        },
-        {
           id: "explore",
           label: "Explore",
           icon: Search,
           href: "/explore",
           isActive: pathname === "/explore",
+        },
+        {
+          id: "home",
+          label: "Home",
+          icon: Home,
+          href: "/",
+          isActive: pathname === "/",
         },
         {
           id: "login",

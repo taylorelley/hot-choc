@@ -40,8 +40,10 @@ export default function NewRatingPage() {
   const [showSuccess, setShowSuccess] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [suggestions, setSuggestions] = useState<{ name: string; lat: number; lon: number }[]>([])
+  const [manualSearch, setManualSearch] = useState(false)
 
   useEffect(() => {
+    if (!manualSearch) return
     if (searchQuery.trim().length < 3) {
       setSuggestions([])
       return
@@ -73,7 +75,7 @@ export default function NewRatingPage() {
       controller.abort()
       clearTimeout(timer)
     }
-  }, [searchQuery])
+  }, [searchQuery, manualSearch])
 
   const compressImage = (
     dataUrl: string,
@@ -113,6 +115,25 @@ export default function NewRatingPage() {
     }
   }
 
+  const fetchNearbyCafes = async (
+    lat: number,
+    lng: number,
+  ): Promise<{ name: string; lat: number; lon: number }[]> => {
+    try {
+      const query = `[out:json];node(around:300,${lat},${lng})[amenity=cafe];out;`
+      const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`
+      const res = await fetch(url)
+      const data = await res.json()
+      return (data.elements || [])
+        .filter((el: any) => el.tags?.name)
+        .slice(0, 5)
+        .map((el: any) => ({ name: el.tags.name as string, lat: el.lat, lon: el.lon }))
+    } catch (err) {
+      console.error('Failed to fetch nearby cafes', err)
+      return []
+    }
+  }
+
   const handlePhotoCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
@@ -135,16 +156,25 @@ export default function NewRatingPage() {
           const lat = position.coords.latitude
           const lng = position.coords.longitude
           let cafe = ''
+          let nearby: { name: string; lat: number; lon: number }[] = []
           try {
-            cafe = await fetchCafeName(lat, lng)
+            [cafe, nearby] = await Promise.all([
+              fetchCafeName(lat, lng),
+              fetchNearbyCafes(lat, lng),
+            ])
           } catch (err) {
-            console.error('Error fetching cafe name', err)
+            console.error('Error fetching cafe info', err)
           }
           setLocation({
             lat,
             lng,
             name: cafe || `${lat.toFixed(4)}, ${lng.toFixed(4)}`,
           })
+          setManualSearch(false)
+          if (nearby.length > 0) {
+            setSuggestions(nearby)
+            setSearchQuery(cafe || '')
+          }
           setIsGettingLocation(false)
           if (currentStep === 2) setCurrentStep(3)
         },
@@ -383,6 +413,7 @@ export default function NewRatingPage() {
                   placeholder="Search address or cafe..."
                   value={searchQuery}
                   onChange={(e) => {
+                    setManualSearch(true)
                     setSearchQuery(e.target.value)
                     setLocation((prev) => ({ ...prev, name: e.target.value }))
                   }}

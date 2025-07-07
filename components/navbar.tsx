@@ -145,7 +145,7 @@ export default function Navbar() {
         <div className="max-w-md mx-auto">
           <div className="bg-white/80 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-2">
             <div
-              className="grid"
+              className="grid place-items-center"
               style={{ gridTemplateColumns: `repeat(${navItems.length}, minmax(0, 1fr))` }}
             >
               {navItems.map((item) => {
@@ -156,7 +156,7 @@ export default function Navbar() {
                     <button
                       key={item.id}
                       onClick={item.onClick}
-                      className={`relative flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-300 w-full flex-1 ${
+                      className={`relative flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-300 w-full h-full flex-1 ${
                         item.isSpecial
                           ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg hover:shadow-xl hover:scale-105"
                           : item.isActive
@@ -173,9 +173,9 @@ export default function Navbar() {
                 }
 
                 return (
-                  <Link key={item.id} href={item.href || "/"} className="flex-1">
+                  <Link key={item.id} href={item.href || "/"} className="flex-1 h-full">
                     <button
-                      className={`relative flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-300 w-full ${
+                      className={`relative flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-300 w-full h-full ${
                         item.isSpecial
                           ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg hover:shadow-xl hover:scale-105"
                           : item.isActive

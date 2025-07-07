@@ -86,6 +86,7 @@ export default function NewRatingPage() {
     }
 
     setIsSaving(true)
+    let errorMessage = ''
 
     // Simulate API call delay for better UX
     await new Promise((resolve) => setTimeout(resolve, 1500))
@@ -100,6 +101,7 @@ export default function NewRatingPage() {
         }
       } catch (err) {
         console.error("Failed to parse current user info", err)
+        errorMessage = 'Failed to read user information.'
       }
     }
 
@@ -124,6 +126,7 @@ export default function NewRatingPage() {
       }
     } catch (err) {
       console.error("Failed to read ratings from localStorage", err)
+      errorMessage = 'Failed to read saved ratings.'
       existingRatings = []
     }
 
@@ -133,14 +136,19 @@ export default function NewRatingPage() {
       localStorage.setItem("hotChocRatings", JSON.stringify(updatedRatings))
     } catch (err) {
       console.error("Failed to save rating", err)
+      errorMessage = 'Failed to save rating.'
     }
 
     setIsSaving(false)
-    setShowSuccess(true)
+    if (errorMessage) {
+      alert(errorMessage)
+    } else {
+      setShowSuccess(true)
 
-    setTimeout(() => {
-      router.push("/")
-    }, 2000)
+      setTimeout(() => {
+        router.push("/")
+      }, 2000)
+    }
   }
 
   const ratingLabels = {

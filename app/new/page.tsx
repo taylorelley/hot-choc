@@ -395,7 +395,7 @@ export default function NewRatingPage() {
                   </div>
                 )}
                 {suggestions.length > 0 && (
-                  <ul className="absolute z-10 mt-1 left-0 right-0 bg-white rounded-xl border shadow-lg max-h-60 overflow-auto">
+                  <ul className="absolute z-[100] mt-1 left-0 right-0 bg-white rounded-xl border shadow-lg max-h-60 overflow-auto">
                     {suggestions.map((s) => (
                       <li
                         key={`${s.lat}-${s.lon}`}

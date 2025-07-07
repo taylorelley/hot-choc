@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { MapPin, Calendar, Star, Share2, Heart } from "lucide-react"
+import { MapPin, Calendar, Star, Share2, Heart, Trash2 } from "lucide-react"
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import Link from "next/link"
 import Image from "next/image"
@@ -33,6 +33,7 @@ export default function RatingDetailPage() {
   const [rating, setRating] = useState<Rating | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isFavorite, setIsFavorite] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   useEffect(() => {
     setTimeout(() => {
@@ -121,7 +122,6 @@ export default function RatingDetailPage() {
 
   const handleDelete = () => {
     if (!rating) return
-    if (!confirm('Delete this rating?')) return
     try {
       const raw = localStorage.getItem('hotChocRatings')
       if (raw) {
@@ -134,10 +134,12 @@ export default function RatingDetailPage() {
     } catch (err) {
       console.error('Failed to delete rating', err)
     }
+    setShowDeleteConfirm(false)
     router.push('/dashboard')
   }
 
   return (
+    <>
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50">
       {/* Animated Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -165,6 +167,12 @@ export default function RatingDetailPage() {
             </button>
             <button className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
               <Share2 className="w-5 h-5 text-amber-700" />
+            </button>
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            >
+              <Trash2 className="w-5 h-5 text-red-600" />
             </button>
           </div>
         </div>
@@ -314,16 +322,20 @@ export default function RatingDetailPage() {
             </div>
           )}
 
-          <div className="text-center">
-            <button
-              onClick={handleDelete}
-              className="mt-6 bg-red-500 hover:bg-red-600 text-white py-3 px-6 rounded-xl font-medium transition-colors"
-            >
-              Delete Rating
-            </button>
-          </div>
         </div>
       </div>
     </div>
+    {showDeleteConfirm && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+        <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center space-y-4">
+          <p className="text-amber-900 font-semibold">Delete this rating?</p>
+          <div className="flex gap-3">
+            <button onClick={() => setShowDeleteConfirm(false)} className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded-xl transition-colors">Cancel</button>
+            <button onClick={handleDelete} className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-xl transition-colors">Delete</button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   )
 }

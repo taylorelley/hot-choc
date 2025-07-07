@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import type React from "react"
-import { useState, useRef, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Camera, MapPin, Save, Sparkles, Zap, CheckCircle } from "lucide-react"
-import NextImage from "next/image"
+import type React from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { Camera, MapPin, Save, Sparkles, Zap, CheckCircle } from 'lucide-react'
+import NextImage from 'next/image'
 
 interface RatingData {
   temperature: number
@@ -19,11 +19,11 @@ export default function NewRatingPage() {
   const router = useRouter()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const [photo, setPhoto] = useState<string>("")
+  const [photo, setPhoto] = useState<string>('')
   const [location, setLocation] = useState({
     lat: 0,
     lng: 0,
-    name: "",
+    name: '',
   })
   const [ratings, setRatings] = useState<RatingData>({
     temperature: 3,
@@ -33,13 +33,15 @@ export default function NewRatingPage() {
     creaminess: 3,
     presentation: 3,
   })
-  const [notes, setNotes] = useState("")
+  const [notes, setNotes] = useState('')
   const [isGettingLocation, setIsGettingLocation] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
   const [showSuccess, setShowSuccess] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [suggestions, setSuggestions] = useState<{ name: string; lat: number; lon: number }[]>([])
+  const [searchQuery, setSearchQuery] = useState('')
+  const [suggestions, setSuggestions] = useState<
+    { name: string; lat: number; lon: number }[]
+  >([])
   const [manualSearch, setManualSearch] = useState(false)
 
   useEffect(() => {
@@ -63,7 +65,7 @@ export default function NewRatingPage() {
             name: item.display_name as string,
             lat: parseFloat(item.lat),
             lon: parseFloat(item.lon),
-          }))
+          })),
         )
       } catch (err: any) {
         if (err.name !== 'AbortError') {
@@ -85,14 +87,14 @@ export default function NewRatingPage() {
     return new Promise((resolve) => {
       const img = new Image()
       img.onload = () => {
-        const canvas = document.createElement("canvas")
+        const canvas = document.createElement('canvas')
         const scale = Math.min(maxSize / img.width, maxSize / img.height, 1)
         canvas.width = img.width * scale
         canvas.height = img.height * scale
-        const ctx = canvas.getContext("2d")
+        const ctx = canvas.getContext('2d')
         if (ctx) {
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-          resolve(canvas.toDataURL("image/jpeg", quality))
+          resolve(canvas.toDataURL('image/jpeg', quality))
         } else {
           resolve(dataUrl)
         }
@@ -127,7 +129,11 @@ export default function NewRatingPage() {
       return (data.elements || [])
         .filter((el: any) => el.tags?.name)
         .slice(0, 5)
-        .map((el: any) => ({ name: el.tags.name as string, lat: el.lat, lon: el.lon }))
+        .map((el: any) => ({
+          name: el.tags.name as string,
+          lat: el.lat,
+          lon: el.lon,
+        }))
     } catch (err) {
       console.error('Failed to fetch nearby cafes', err)
       return []
@@ -158,28 +164,29 @@ export default function NewRatingPage() {
           let cafe = ''
           let nearby: { name: string; lat: number; lon: number }[] = []
           try {
-            [cafe, nearby] = await Promise.all([
+            const [foundCafe, foundNearby] = await Promise.all([
               fetchCafeName(lat, lng),
               fetchNearbyCafes(lat, lng),
             ])
+            cafe = foundCafe
+            nearby = foundNearby
           } catch (err) {
             console.error('Error fetching cafe info', err)
           }
-          setLocation({
-            lat,
-            lng,
-            name: cafe || `${lat.toFixed(4)}, ${lng.toFixed(4)}`,
-          })
+          setLocation({ lat, lng, name: '' })
           setManualSearch(false)
           if (nearby.length > 0) {
-            setSuggestions(nearby)
-            setSearchQuery(cafe || '')
+            const list = cafe
+              ? [{ name: cafe, lat, lon: lng }, ...nearby]
+              : nearby
+            setSuggestions(list)
+            setSearchQuery('')
           }
           setIsGettingLocation(false)
           if (currentStep === 2) setCurrentStep(3)
         },
         (error) => {
-          console.error("Error getting location:", error)
+          console.error('Error getting location:', error)
           setIsGettingLocation(false)
         },
       )
@@ -188,7 +195,10 @@ export default function NewRatingPage() {
     }
   }
 
-  const handleRatingChange = (characteristic: keyof RatingData, value: number) => {
+  const handleRatingChange = (
+    characteristic: keyof RatingData,
+    value: number,
+  ) => {
     setRatings((prev) => ({
       ...prev,
       [characteristic]: value,
@@ -197,7 +207,7 @@ export default function NewRatingPage() {
 
   const handleSave = async () => {
     if (!photo) {
-      alert("Please take a photo first!")
+      alert('Please take a photo first!')
       return
     }
 
@@ -207,16 +217,16 @@ export default function NewRatingPage() {
     // Simulate API call delay for better UX
     await new Promise((resolve) => setTimeout(resolve, 1500))
 
-    const currentUserRaw = localStorage.getItem("currentUser")
+    const currentUserRaw = localStorage.getItem('currentUser')
     let userId: string | undefined
     if (currentUserRaw) {
       try {
         const parsed = JSON.parse(currentUserRaw)
-        if (parsed && typeof parsed.id === "string") {
+        if (parsed && typeof parsed.id === 'string') {
           userId = parsed.id
         }
       } catch (err) {
-        console.error("Failed to parse current user info", err)
+        console.error('Failed to parse current user info', err)
         errorMessage = 'Failed to read user information.'
       }
     }
@@ -233,7 +243,7 @@ export default function NewRatingPage() {
 
     let existingRatings: any[] = []
     try {
-      const stored = localStorage.getItem("hotChocRatings")
+      const stored = localStorage.getItem('hotChocRatings')
       if (stored) {
         existingRatings = JSON.parse(stored)
         if (!Array.isArray(existingRatings)) {
@@ -241,7 +251,7 @@ export default function NewRatingPage() {
         }
       }
     } catch (err) {
-      console.error("Failed to read ratings from localStorage", err)
+      console.error('Failed to read ratings from localStorage', err)
       errorMessage = 'Failed to read saved ratings.'
       existingRatings = []
     }
@@ -249,17 +259,17 @@ export default function NewRatingPage() {
     const updatedRatings = [newRating, ...existingRatings]
 
     try {
-      localStorage.setItem("hotChocRatings", JSON.stringify(updatedRatings))
+      localStorage.setItem('hotChocRatings', JSON.stringify(updatedRatings))
     } catch (err: any) {
-      console.error("Failed to save rating", err)
+      console.error('Failed to save rating', err)
       if (
-        err?.name === "QuotaExceededError" ||
-        err?.name === "NS_ERROR_DOM_QUOTA_REACHED"
+        err?.name === 'QuotaExceededError' ||
+        err?.name === 'NS_ERROR_DOM_QUOTA_REACHED'
       ) {
         errorMessage =
-          "Storage limit reached. Please remove old ratings or use smaller photos."
+          'Storage limit reached. Please remove old ratings or use smaller photos.'
       } else {
-        errorMessage = "Failed to save rating."
+        errorMessage = 'Failed to save rating.'
       }
     }
 
@@ -270,18 +280,48 @@ export default function NewRatingPage() {
       setShowSuccess(true)
 
       setTimeout(() => {
-        router.push("/")
+        router.push('/')
       }, 2000)
     }
   }
 
   const ratingLabels = {
-    temperature: { min: "Cold", max: "Hot", icon: "🌡️", color: "from-blue-400 to-red-400" },
-    sweetness: { min: "Bland", max: "Sweet", icon: "🍯", color: "from-gray-400 to-yellow-400" },
-    texture: { min: "Thin", max: "Thick", icon: "🥛", color: "from-blue-300 to-amber-300" },
-    chocolate: { min: "Mild", max: "Rich", icon: "🍫", color: "from-amber-400 to-amber-800" },
-    creaminess: { min: "Light", max: "Creamy", icon: "🥛", color: "from-white to-amber-200" },
-    presentation: { min: "Plain", max: "Beautiful", icon: "✨", color: "from-gray-300 to-purple-400" },
+    temperature: {
+      min: 'Cold',
+      max: 'Hot',
+      icon: '🌡️',
+      color: 'from-blue-400 to-red-400',
+    },
+    sweetness: {
+      min: 'Bland',
+      max: 'Sweet',
+      icon: '🍯',
+      color: 'from-gray-400 to-yellow-400',
+    },
+    texture: {
+      min: 'Thin',
+      max: 'Thick',
+      icon: '🥛',
+      color: 'from-blue-300 to-amber-300',
+    },
+    chocolate: {
+      min: 'Mild',
+      max: 'Rich',
+      icon: '🍫',
+      color: 'from-amber-400 to-amber-800',
+    },
+    creaminess: {
+      min: 'Light',
+      max: 'Creamy',
+      icon: '🥛',
+      color: 'from-white to-amber-200',
+    },
+    presentation: {
+      min: 'Plain',
+      max: 'Beautiful',
+      icon: '✨',
+      color: 'from-gray-300 to-purple-400',
+    },
   }
 
   const stepProgress = ((currentStep - 1) / 4) * 100
@@ -291,7 +331,9 @@ export default function NewRatingPage() {
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center">
         <div className="text-center animate-bounce">
           <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-green-800 mb-2">Rating Saved!</h2>
+          <h2 className="text-2xl font-bold text-green-800 mb-2">
+            Rating Saved!
+          </h2>
           <p className="text-green-600">Redirecting you back...</p>
         </div>
       </div>
@@ -328,19 +370,21 @@ export default function NewRatingPage() {
         <div className="space-y-6">
           {/* Photo Capture */}
           <div
-            className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 transition-all duration-500 ${currentStep >= 1 ? "scale-100 opacity-100" : "scale-95 opacity-50"}`}
+            className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 transition-all duration-500 ${currentStep >= 1 ? 'scale-100 opacity-100' : 'scale-95 opacity-50'}`}
           >
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-gradient-to-r from-amber-400 to-orange-400 rounded-full">
                 <Camera className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-lg font-semibold text-amber-900">📸 Capture the Moment</h2>
+              <h2 className="text-lg font-semibold text-amber-900">
+                📸 Capture the Moment
+              </h2>
             </div>
 
             {photo ? (
               <div className="relative group">
                 <NextImage
-                  src={photo || "/placeholder.svg"}
+                  src={photo || '/placeholder.svg'}
                   alt="Hot chocolate"
                   width={400}
                   height={400}
@@ -364,7 +408,9 @@ export default function NewRatingPage() {
                   <Camera className="w-8 h-8 text-amber-600" />
                 </div>
                 <span className="font-medium text-lg">Take Photo</span>
-                <span className="text-sm text-amber-500 mt-1">Tap to capture your hot chocolate</span>
+                <span className="text-sm text-amber-500 mt-1">
+                  Tap to capture your hot chocolate
+                </span>
               </button>
             )}
             <input
@@ -379,13 +425,15 @@ export default function NewRatingPage() {
 
           {/* Location */}
           <div
-            className={`relative z-50 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 transition-all duration-500 ${currentStep >= 2 ? "scale-100 opacity-100" : "scale-95 opacity-50"}`}
+            className={`relative z-50 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 transition-all duration-500 ${currentStep >= 2 ? 'scale-100 opacity-100' : 'scale-95 opacity-50'}`}
           >
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full">
                 <MapPin className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-lg font-semibold text-amber-900">📍 Where was this?</h2>
+              <h2 className="text-lg font-semibold text-amber-900">
+                📍 Where was this?
+              </h2>
             </div>
 
             <div className="space-y-4">
@@ -427,7 +475,9 @@ export default function NewRatingPage() {
                 )}
                 {suggestions.length > 0 && (
                   <ul className="absolute z-[100] mt-1 left-0 right-0 bg-white rounded-xl border shadow-lg max-h-60 overflow-auto">
-                    <li className="p-2 text-xs font-semibold text-amber-700 sticky top-0 bg-white border-b">Nearby Places</li>
+                    <li className="p-2 text-xs font-semibold text-amber-700 sticky top-0 bg-white border-b">
+                      Nearby Places
+                    </li>
                     {suggestions.map((s) => (
                       <li
                         key={`${s.lat}-${s.lon}`}
@@ -447,7 +497,8 @@ export default function NewRatingPage() {
               </div>
               {location.lat !== 0 && location.lng !== 0 && (
                 <p className="text-sm text-gray-600 mt-2">
-                  Coordinates: {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+                  Coordinates: {location.lat.toFixed(4)},{' '}
+                  {location.lng.toFixed(4)}
                 </p>
               )}
             </div>
@@ -455,13 +506,15 @@ export default function NewRatingPage() {
 
           {/* Ratings */}
           <div
-            className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 transition-all duration-500 ${currentStep >= 3 ? "scale-100 opacity-100" : "scale-95 opacity-50"}`}
+            className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 transition-all duration-500 ${currentStep >= 3 ? 'scale-100 opacity-100' : 'scale-95 opacity-50'}`}
           >
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-lg font-semibold text-amber-900">⭐ Rate the Experience</h2>
+              <h2 className="text-lg font-semibold text-amber-900">
+                ⭐ Rate the Experience
+              </h2>
             </div>
 
             <div className="space-y-6">
@@ -469,19 +522,25 @@ export default function NewRatingPage() {
                 <div key={key} className="group">
                   <div className="flex justify-between items-center mb-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-xl">{ratingLabels[key as keyof typeof ratingLabels].icon}</span>
+                      <span className="text-xl">
+                        {ratingLabels[key as keyof typeof ratingLabels].icon}
+                      </span>
                       <label className="font-medium text-amber-900 capitalize">
-                        {key.replace(/([A-Z])/g, " $1").trim()}
+                        {key.replace(/([A-Z])/g, ' $1').trim()}
                       </label>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl font-bold text-amber-600">{value}</span>
+                      <span className="text-2xl font-bold text-amber-600">
+                        {value}
+                      </span>
                       <div className="flex gap-1">
                         {Array.from({ length: 5 }).map((_, i) => (
                           <div
                             key={i}
                             className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                              i < value ? "bg-amber-400 scale-110" : "bg-amber-200"
+                              i < value
+                                ? 'bg-amber-400 scale-110'
+                                : 'bg-amber-200'
                             }`}
                           />
                         ))}
@@ -495,7 +554,12 @@ export default function NewRatingPage() {
                       min="0"
                       max="5"
                       value={value}
-                      onChange={(e) => handleRatingChange(key as keyof RatingData, Number.parseInt(e.target.value))}
+                      onChange={(e) =>
+                        handleRatingChange(
+                          key as keyof RatingData,
+                          Number.parseInt(e.target.value),
+                        )
+                      }
                       className="w-full h-3 rounded-lg appearance-none cursor-pointer slider"
                       style={{
                         background: `linear-gradient(to right, 
@@ -509,8 +573,12 @@ export default function NewRatingPage() {
                   </div>
 
                   <div className="flex justify-between text-xs text-amber-600 mt-2">
-                    <span>{ratingLabels[key as keyof typeof ratingLabels].min}</span>
-                    <span>{ratingLabels[key as keyof typeof ratingLabels].max}</span>
+                    <span>
+                      {ratingLabels[key as keyof typeof ratingLabels].min}
+                    </span>
+                    <span>
+                      {ratingLabels[key as keyof typeof ratingLabels].max}
+                    </span>
                   </div>
                 </div>
               ))}
@@ -519,13 +587,15 @@ export default function NewRatingPage() {
 
           {/* Notes */}
           <div
-            className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 transition-all duration-500 ${currentStep >= 4 ? "scale-100 opacity-100" : "scale-95 opacity-50"}`}
+            className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 transition-all duration-500 ${currentStep >= 4 ? 'scale-100 opacity-100' : 'scale-95 opacity-50'}`}
           >
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-lg font-semibold text-amber-900">📝 Your Thoughts</h2>
+              <h2 className="text-lg font-semibold text-amber-900">
+                📝 Your Thoughts
+              </h2>
             </div>
 
             <textarea

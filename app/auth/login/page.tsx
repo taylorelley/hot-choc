@@ -10,6 +10,8 @@ import Image from 'next/image'
 
 export default function LoginPage() {
   const router = useRouter()
+  const API_URL =
+    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -22,25 +24,41 @@ export default function LoginPage() {
     e.preventDefault()
     setIsLoading(true)
     setError('')
+    console.log('Sending login request to', `${API_URL}/api/login`)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    try {
+      const res = await fetch(`${API_URL}/api/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
+      })
 
-    // Mock authentication - in real app, this would be an API call
-    const users = JSON.parse(localStorage.getItem('hotChocUsers') || '[]')
-    const user = users.find(
-      (u: any) =>
-        u.email === formData.email && u.password === formData.password,
-    )
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.message || 'Invalid email or password')
+      }
 
-    if (user) {
-      localStorage.setItem('currentUser', JSON.stringify(user))
+      const data = await res.json()
+      localStorage.setItem('token', data.token)
+      if (data.user) {
+        console.log('Received user from login', data.user)
+        localStorage.setItem('currentUser', JSON.stringify(data.user))
+      } else {
+        localStorage.setItem(
+          'currentUser',
+          JSON.stringify({ email: formData.email }),
+        )
+      }
       router.push('/dashboard')
-    } else {
-      setError('Invalid email or password')
+    } catch (err: any) {
+      console.error('Login failed', err)
+      setError(err.message || 'Invalid email or password')
+    } finally {
+      setIsLoading(false)
     }
-
-    setIsLoading(false)
   }
 
   return (

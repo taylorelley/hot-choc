@@ -22,8 +22,11 @@ describe('server api', () => {
   test('register and login', async () => {
     const user = { name: 'Test', email: 'test@example.com', password: 'pass' }
     await request(app).post('/api/register').send(user).expect(200)
-    const res = await request(app).post('/api/login').send({ email: user.email, password: user.password })
+    const res = await request(app)
+      .post('/api/login')
+      .send({ email: user.email, password: user.password })
     expect(res.status).toBe(200)
     expect(res.body.token).toBeDefined()
+    expect(res.body.user).toEqual({ id: expect.any(String), name: 'Test', email: user.email })
   })
 })

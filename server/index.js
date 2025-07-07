@@ -66,10 +66,12 @@ app.post('/api/login', async (req, res) => {
 });
 
 app.get('/api/ratings', (req, res) => {
+  console.log('List ratings');
   res.json(data.ratings);
 });
 
 app.post('/api/ratings', authMiddleware, (req, res) => {
+  console.log('Create rating by user', req.user.email);
   const rating = { id: Date.now().toString(), userId: req.user.id, ...req.body };
   data.ratings.push(rating);
   saveData();
@@ -77,6 +79,7 @@ app.post('/api/ratings', authMiddleware, (req, res) => {
 });
 
 app.get('/api/ratings/:id', (req, res) => {
+  console.log('Get rating', req.params.id);
   const rating = data.ratings.find(r => r.id === req.params.id);
   if (!rating) return res.status(404).json({ message: 'Not found' });
   res.json(rating);

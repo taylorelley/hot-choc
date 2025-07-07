@@ -109,6 +109,19 @@ export default function DashboardPage() {
 
       setUser(updatedUser)
       localStorage.setItem('currentUser', JSON.stringify(updatedUser))
+    } else {
+      const updatedUser = {
+        ...userData,
+        stats: {
+          totalRatings: 0,
+          averageRating: 0,
+          favoriteLocation: '',
+          totalLocations: 0,
+        },
+      }
+
+      setUser(updatedUser)
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser))
     }
 
     // In a real app this would fetch data from the API

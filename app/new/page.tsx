@@ -427,6 +427,7 @@ export default function NewRatingPage() {
                 )}
                 {suggestions.length > 0 && (
                   <ul className="absolute z-[100] mt-1 left-0 right-0 bg-white rounded-xl border shadow-lg max-h-60 overflow-auto">
+                    <li className="p-2 text-xs font-semibold text-amber-700 sticky top-0 bg-white border-b">Nearby Places</li>
                     {suggestions.map((s) => (
                       <li
                         key={`${s.lat}-${s.lon}`}
@@ -444,6 +445,11 @@ export default function NewRatingPage() {
                   </ul>
                 )}
               </div>
+              {location.lat !== 0 && location.lng !== 0 && (
+                <p className="text-sm text-gray-600 mt-2">
+                  Coordinates: {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+                </p>
+              )}
             </div>
           </div>
 

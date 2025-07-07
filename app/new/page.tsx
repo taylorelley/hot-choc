@@ -379,7 +379,7 @@ export default function NewRatingPage() {
 
           {/* Location */}
           <div
-            className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 transition-all duration-500 ${currentStep >= 2 ? "scale-100 opacity-100" : "scale-95 opacity-50"}`}
+            className={`relative z-50 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 transition-all duration-500 ${currentStep >= 2 ? "scale-100 opacity-100" : "scale-95 opacity-50"}`}
           >
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full">

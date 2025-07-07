@@ -172,13 +172,23 @@ export default function SettingsPage() {
               {/* Avatar */}
               <div className="text-center mb-6">
                 <div className="relative inline-block">
-                  <Image
-                    src={user.avatar || "/placeholder.svg?height=100&width=100"}
-                    alt={user.name}
-                    width={100}
-                    height={100}
-                    className="w-24 h-24 rounded-full object-cover border-4 border-amber-200"
-                  />
+                  {user.avatar ? (
+                    <Image
+                      src={user.avatar}
+                      alt={user.name}
+                      width={100}
+                      height={100}
+                      className="w-24 h-24 rounded-full object-cover border-4 border-amber-200"
+                    />
+                  ) : (
+                    <span
+                      className="w-24 h-24 flex items-center justify-center text-6xl border-4 border-amber-200 rounded-full"
+                      role="img"
+                      aria-label="No avatar"
+                    >
+                      👤
+                    </span>
+                  )}
                   <button
                     onClick={() => document.getElementById("avatar-upload")?.click()}
                     className="absolute -bottom-2 -right-2 bg-amber-500 text-white p-2 rounded-full shadow-lg hover:bg-amber-600 transition-colors"

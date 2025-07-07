@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Image from 'next/image'
 import {
   Search,
@@ -11,6 +11,8 @@ import {
   Heart,
   CircleUserRound,
 } from 'lucide-react'
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import MarkerClusterGroup from 'react-leaflet-cluster'
 
 interface User {
   id: string
@@ -46,6 +48,27 @@ interface CommunityRating {
   isLiked?: boolean
 }
 
+interface LocalRating {
+  id: string
+  photo: string
+  location: {
+    lat: number
+    lng: number
+    name: string
+  }
+  ratings: {
+    temperature: number
+    sweetness: number
+    texture: number
+    chocolate: number
+    creaminess: number
+    presentation: number
+  }
+  notes: string
+  timestamp: string
+  userId?: string
+}
+
 export default function ExplorePage() {
   const [activeTab, setActiveTab] = useState('nearby')
   const [searchQuery, setSearchQuery] = useState('')
@@ -54,6 +77,7 @@ export default function ExplorePage() {
   )
   const [topUsers, setTopUsers] = useState<User[]>([])
   const [currentUser, setCurrentUser] = useState<any>(null)
+  const [localRatings, setLocalRatings] = useState<LocalRating[]>([])
 
   useEffect(() => {
     const user = localStorage.getItem('currentUser')
@@ -64,6 +88,24 @@ export default function ExplorePage() {
     // In a real app this would fetch community data from the API
     setCommunityRatings([])
     setTopUsers([])
+
+    // Load ratings saved locally
+    try {
+      const raw = localStorage.getItem('hotChocRatings')
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        if (Array.isArray(parsed)) {
+          setLocalRatings(
+            parsed.filter(
+              (r: LocalRating) =>
+                r.location && r.location.lat && r.location.lng,
+            ),
+          )
+        }
+      }
+    } catch (err) {
+      console.error('Failed to read local ratings', err)
+    }
   }, [])
 
   const getAverageRating = (ratings: CommunityRating['ratings']) => {
@@ -106,6 +148,32 @@ export default function ExplorePage() {
       ),
     )
   }
+
+  const ratingAverage = (r: LocalRating['ratings']) => {
+    const vals = Object.values(r)
+    return vals.reduce((s, v) => s + v, 0) / vals.length
+  }
+
+  const locationGroups = useMemo(() => {
+    const map = new Map<
+      string,
+      { location: LocalRating['location']; ratings: LocalRating[] }
+    >()
+    localRatings.forEach((r) => {
+      const key = `${r.location.lat},${r.location.lng}`
+      if (!map.has(key)) {
+        map.set(key, { location: r.location, ratings: [] })
+      }
+      map.get(key)!.ratings.push(r)
+    })
+    return Array.from(map.values()).map((g) => ({
+      ...g,
+      average:
+        g.ratings.reduce((sum, r) => sum + ratingAverage(r.ratings), 0) /
+        g.ratings.length,
+      firstId: g.ratings[0].id,
+    }))
+  }, [localRatings])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50">
@@ -279,57 +347,49 @@ export default function ExplorePage() {
         )}
 
         {activeTab === 'map' && (
-          <div className="space-y-4">
-            {topUsers.map((user) => (
-              <div
-                key={user.id}
-                className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    {user.avatar ? (
-                      <Image
-                        src={user.avatar}
-                        alt={user.name}
-                        width={50}
-                        height={50}
-                        className="w-12 h-12 rounded-full object-cover border-2 border-amber-200"
-                      />
-                    ) : (
-                      <span
-                        className="w-12 h-12 flex items-center justify-center border-2 border-amber-200 rounded-full"
-                        role="img"
-                        aria-label="No avatar"
-                      >
-                        <CircleUserRound className="w-6 h-6 text-amber-500" />
-                      </span>
-                    )}
-                    <div>
-                      <h3 className="font-semibold text-amber-900">
-                        {user.name}
-                      </h3>
-                      <div className="flex items-center gap-4 text-sm text-amber-600">
-                        <span>{user.stats.totalRatings} ratings</span>
-                        <div className="flex items-center gap-1">
-                          <Star className="w-3 h-3 text-amber-500 fill-current" />
-                          <span>{user.stats.averageRating}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => handleFollow(user.id)}
-                    className={`px-6 py-2 rounded-full font-medium transition-all duration-300 ${
-                      user.isFollowing
-                        ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                        : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 shadow-lg hover:shadow-xl'
-                    }`}
+          <div className="h-96 rounded-2xl overflow-hidden bg-white/80 backdrop-blur-sm shadow-lg">
+            <MapContainer
+              center={
+                locationGroups.length > 0
+                  ? [
+                      locationGroups[0].location.lat,
+                      locationGroups[0].location.lng,
+                    ]
+                  : [0, 0]
+              }
+              zoom={13}
+              style={{ height: '100%', width: '100%' }}
+            >
+              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+              <MarkerClusterGroup chunkedLoading>
+                {locationGroups.map((group, idx) => (
+                  <Marker
+                    key={idx}
+                    position={[group.location.lat, group.location.lng]}
                   >
-                    {user.isFollowing ? 'Following' : 'Follow'}
-                  </button>
-                </div>
-              </div>
-            ))}
+                    <Popup>
+                      <div className="space-y-1">
+                        <div className="font-semibold text-amber-900">
+                          {group.location.name}
+                        </div>
+                        <div className="flex items-center gap-1 text-amber-700">
+                          <Star className="w-4 h-4 text-amber-500 fill-current" />
+                          <span className="font-medium">
+                            {group.average.toFixed(1)}
+                          </span>
+                        </div>
+                        <a
+                          href={`/view/${group.firstId}`}
+                          className="text-amber-600 underline text-sm"
+                        >
+                          View Ratings
+                        </a>
+                      </div>
+                    </Popup>
+                  </Marker>
+                ))}
+              </MarkerClusterGroup>
+            </MapContainer>
           </div>
         )}
       </div>

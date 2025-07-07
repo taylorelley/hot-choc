@@ -24,7 +24,7 @@ npm start
 The API listens on port `3001` by default and exposes the following endpoints:
 
 - `POST /api/register` – create a user
-- `POST /api/login` – obtain a JWT token
+- `POST /api/login` – obtain a JWT token and the logged-in user
 - `GET /api/ratings` – list all ratings
 - `POST /api/ratings` – create a rating (requires `Authorization: Bearer <token>`)
 - `GET /api/ratings/:id` – fetch a single rating

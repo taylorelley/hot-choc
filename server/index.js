@@ -59,8 +59,10 @@ app.post('/api/login', async (req, res) => {
   if (!user) return res.status(400).json({ message: 'Invalid credentials' });
   const match = await bcrypt.compare(password, user.password);
   if (!match) return res.status(400).json({ message: 'Invalid credentials' });
-  const token = jwt.sign({ id: user.id, email: user.email }, SECRET, { expiresIn: '7d' });
-  res.json({ token });
+  const token = jwt.sign({ id: user.id, email: user.email }, SECRET, {
+    expiresIn: '7d',
+  });
+  res.json({ token, user: { id: user.id, name: user.name, email: user.email } });
 });
 
 app.get('/api/ratings', (req, res) => {

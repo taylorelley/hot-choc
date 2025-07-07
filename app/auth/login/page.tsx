@@ -43,10 +43,15 @@ export default function LoginPage() {
 
       const data = await res.json()
       localStorage.setItem('token', data.token)
-      localStorage.setItem(
-        'currentUser',
-        JSON.stringify({ email: formData.email }),
-      )
+      if (data.user) {
+        console.log('Received user from login', data.user)
+        localStorage.setItem('currentUser', JSON.stringify(data.user))
+      } else {
+        localStorage.setItem(
+          'currentUser',
+          JSON.stringify({ email: formData.email }),
+        )
+      }
       router.push('/dashboard')
     } catch (err: any) {
       console.error('Login failed', err)

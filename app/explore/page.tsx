@@ -11,8 +11,7 @@ import {
   Heart,
   CircleUserRound,
 } from 'lucide-react'
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
-import MarkerClusterGroup from 'react-leaflet-cluster'
+import dynamic from 'next/dynamic'
 
 interface User {
   id: string
@@ -78,6 +77,10 @@ export default function ExplorePage() {
   const [topUsers, setTopUsers] = useState<User[]>([])
   const [currentUser, setCurrentUser] = useState<any>(null)
   const [localRatings, setLocalRatings] = useState<LocalRating[]>([])
+  const ExploreMap = useMemo(
+    () => dynamic(() => import('../../components/explore-map'), { ssr: false }),
+    [],
+  )
 
   useEffect(() => {
     const user = localStorage.getItem('currentUser')
@@ -346,52 +349,7 @@ export default function ExplorePage() {
           </div>
         )}
 
-        {activeTab === 'map' && (
-          <div className="h-96 rounded-2xl overflow-hidden bg-white/80 backdrop-blur-sm shadow-lg">
-            <MapContainer
-              center={
-                locationGroups.length > 0
-                  ? [
-                      locationGroups[0].location.lat,
-                      locationGroups[0].location.lng,
-                    ]
-                  : [0, 0]
-              }
-              zoom={13}
-              style={{ height: '100%', width: '100%' }}
-            >
-              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-              <MarkerClusterGroup chunkedLoading>
-                {locationGroups.map((group, idx) => (
-                  <Marker
-                    key={idx}
-                    position={[group.location.lat, group.location.lng]}
-                  >
-                    <Popup>
-                      <div className="space-y-1">
-                        <div className="font-semibold text-amber-900">
-                          {group.location.name}
-                        </div>
-                        <div className="flex items-center gap-1 text-amber-700">
-                          <Star className="w-4 h-4 text-amber-500 fill-current" />
-                          <span className="font-medium">
-                            {group.average.toFixed(1)}
-                          </span>
-                        </div>
-                        <a
-                          href={`/view/${group.firstId}`}
-                          className="text-amber-600 underline text-sm"
-                        >
-                          View Ratings
-                        </a>
-                      </div>
-                    </Popup>
-                  </Marker>
-                ))}
-              </MarkerClusterGroup>
-            </MapContainer>
-          </div>
-        )}
+        {activeTab === 'map' && <ExploreMap groups={locationGroups} />}
       </div>
     </div>
   )

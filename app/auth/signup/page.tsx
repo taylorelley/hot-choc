@@ -5,13 +5,21 @@ import type React from 'react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Eye, EyeOff, ArrowRight, Mail, Lock, User, Camera } from 'lucide-react'
+import {
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Mail,
+  Lock,
+  User,
+  Camera,
+  CircleUserRound,
+} from 'lucide-react'
 import Image from 'next/image'
 
 export default function SignUpPage() {
   const router = useRouter()
-  const API_URL =
-    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -142,13 +150,10 @@ export default function SignUpPage() {
                             className="w-full h-full object-cover"
                           />
                         ) : (
-                          <span
-                            className="text-5xl"
-                            role="img"
+                          <CircleUserRound
                             aria-label="No avatar"
-                          >
-                            🙂
-                          </span>
+                            className="w-24 h-24 text-amber-500"
+                          />
                         )}
                       </div>
                       <button

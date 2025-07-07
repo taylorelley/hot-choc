@@ -4,7 +4,19 @@ import { useState, useEffect, useRef } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
-import { Star, Plus, Search, User, Coffee, Bell, LogIn, UserPlus, Compass, type LucideIcon } from "lucide-react"
+import {
+  Star,
+  Plus,
+  Search,
+  User,
+  Coffee,
+  Bell,
+  LogIn,
+  UserPlus,
+  Compass,
+  CircleUserRound,
+  type LucideIcon,
+} from "lucide-react"
 
 interface NavbarUser {
   id: string
@@ -196,11 +208,11 @@ export default function Navbar() {
                             />
                           ) : (
                             <span
-                              className="w-6 h-6 flex items-center justify-center text-xl"
+                              className="w-6 h-6 flex items-center justify-center"
                               role="img"
                               aria-label="No avatar"
                             >
-                              🙂
+                              <CircleUserRound className="w-5 h-5 text-current" />
                             </span>
                           )}
                           {item.isActive && (

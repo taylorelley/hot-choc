@@ -29,4 +29,24 @@ describe('server api', () => {
     expect(res.body.token).toBeDefined()
     expect(res.body.user).toEqual({ id: expect.any(String), name: 'Test', email: user.email })
   })
+
+  test('create and delete rating', async () => {
+    const user = { name: 'Del', email: 'del@example.com', password: 'pass' }
+    await request(app).post('/api/register').send(user)
+    const login = await request(app)
+      .post('/api/login')
+      .send({ email: user.email, password: user.password })
+    const token = login.body.token
+    const create = await request(app)
+      .post('/api/ratings')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ location: { name: 'Cafe' }, ratings: {}, notes: '' })
+    const ratingId = create.body.id
+    const del = await request(app)
+      .delete(`/api/ratings/${ratingId}`)
+      .set('Authorization', `Bearer ${token}`)
+    expect(del.status).toBe(200)
+    const list = await request(app).get('/api/ratings')
+    expect(list.body.find((r) => r.id === ratingId)).toBeUndefined()
+  })
 })

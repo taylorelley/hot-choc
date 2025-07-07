@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useParams } from "next/navigation"
-import { MapPin, Calendar, Star, Share2, Heart } from "lucide-react"
+import { useParams, useRouter } from "next/navigation"
+import { MapPin, Calendar, Star, Share2, Heart, Trash2 } from "lucide-react"
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import Link from "next/link"
 import Image from "next/image"
@@ -29,9 +29,11 @@ interface Rating {
 
 export default function RatingDetailPage() {
   const params = useParams()
+  const router = useRouter()
   const [rating, setRating] = useState<Rating | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isFavorite, setIsFavorite] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   useEffect(() => {
     setTimeout(() => {
@@ -118,7 +120,26 @@ export default function RatingDetailPage() {
     presentation: { label: "Presentation", icon: "✨", color: "from-gray-300 to-purple-400" },
   }
 
+  const handleDelete = () => {
+    if (!rating) return
+    try {
+      const raw = localStorage.getItem('hotChocRatings')
+      if (raw) {
+        const list = JSON.parse(raw)
+        if (Array.isArray(list)) {
+          const updated = list.filter((r: any) => r.id !== rating.id)
+          localStorage.setItem('hotChocRatings', JSON.stringify(updated))
+        }
+      }
+    } catch (err) {
+      console.error('Failed to delete rating', err)
+    }
+    setShowDeleteConfirm(false)
+    router.push('/dashboard')
+  }
+
   return (
+    <>
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50">
       {/* Animated Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -136,6 +157,12 @@ export default function RatingDetailPage() {
           </div>
 
           <div className="flex gap-2">
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            >
+              <Trash2 className="w-5 h-5 text-red-600" />
+            </button>
             <button
               onClick={() => setIsFavorite(!isFavorite)}
               className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
@@ -294,8 +321,21 @@ export default function RatingDetailPage() {
               </div>
             </div>
           )}
+
         </div>
       </div>
     </div>
+    {showDeleteConfirm && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+        <div className="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center space-y-4">
+          <p className="text-amber-900 font-semibold">Delete this rating?</p>
+          <div className="flex gap-3">
+            <button onClick={() => setShowDeleteConfirm(false)} className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded-xl transition-colors">Cancel</button>
+            <button onClick={handleDelete} className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-xl transition-colors">Delete</button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   )
 }

@@ -144,7 +144,7 @@ export default function Navbar() {
       >
         <div className="max-w-md mx-auto">
           <div className="bg-white/80 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-2">
-            <div className="flex items-center justify-around">
+            <div className="flex items-center justify-between">
               {navItems.map((item) => {
                 const Icon = item.icon
 
@@ -153,7 +153,7 @@ export default function Navbar() {
                     <button
                       key={item.id}
                       onClick={item.onClick}
-                      className={`relative flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-300 min-w-[60px] ${
+                      className={`relative flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-300 min-w-0 flex-1 ${
                         item.isSpecial
                           ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg hover:shadow-xl hover:scale-105"
                           : item.isActive
@@ -172,7 +172,7 @@ export default function Navbar() {
                 return (
                   <Link key={item.id} href={item.href || "/"}>
                     <button
-                      className={`relative flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-300 min-w-[60px] ${
+                      className={`relative flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-300 min-w-0 flex-1 ${
                         item.isSpecial
                           ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg hover:shadow-xl hover:scale-105"
                           : item.isActive

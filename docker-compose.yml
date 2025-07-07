@@ -4,13 +4,15 @@ services:
     build:
       context: .
       args:
-        NEXT_PUBLIC_API_URL: http://backend:3001
+        # The API URL must be reachable from the browser, so use the host
+        # mapped port rather than the Docker service name.
+        NEXT_PUBLIC_API_URL: http://localhost:3001
     ports:
       - "3000:3000"
     depends_on:
       - backend
     environment:
-      - NEXT_PUBLIC_API_URL=http://backend:3001
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
   backend:
     build: ./server
     ports:

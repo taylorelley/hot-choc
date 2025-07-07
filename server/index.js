@@ -13,6 +13,17 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+// Basic request/response logging to help debug API calls
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`)
+  res.on('finish', () => {
+    console.log(
+      `[${new Date().toISOString()}] ${res.statusCode} ${req.method} ${req.url}`,
+    )
+  })
+  next()
+})
+
 const dataFile = process.env.DATA_FILE || path.join(__dirname, 'data.json')
 let data = { users: [], ratings: [] };
 if (fs.existsSync(dataFile)) {
@@ -38,6 +49,7 @@ function authMiddleware(req, res, next) {
 
 app.post('/api/register', async (req, res) => {
   const { name, email, password } = req.body;
+  console.log('Register request', email)
   if (!name || !email || !password) return res.status(400).json({ message: 'Missing fields' });
   if (data.users.find(u => u.email === email)) return res.status(400).json({ message: 'Email exists' });
   const hashed = await bcrypt.hash(password, 10);
@@ -49,6 +61,7 @@ app.post('/api/register', async (req, res) => {
 
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
+  console.log('Login attempt', email)
   const user = data.users.find(u => u.email === email);
   if (!user) return res.status(400).json({ message: 'Invalid credentials' });
   const match = await bcrypt.compare(password, user.password);
@@ -73,6 +86,12 @@ app.get('/api/ratings/:id', (req, res) => {
   if (!rating) return res.status(404).json({ message: 'Not found' });
   res.json(rating);
 });
+
+// Generic error handler so stack traces appear in logs
+app.use((err, req, res, next) => {
+  console.error('Unhandled error', err)
+  res.status(500).json({ message: 'Server error' })
+})
 
 if (require.main === module) {
   app.listen(PORT, () => console.log(`API running on port ${PORT}`))

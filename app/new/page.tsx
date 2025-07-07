@@ -90,8 +90,22 @@ export default function NewRatingPage() {
     // Simulate API call delay for better UX
     await new Promise((resolve) => setTimeout(resolve, 1500))
 
+    const currentUserRaw = localStorage.getItem("currentUser")
+    let userId: string | undefined
+    if (currentUserRaw) {
+      try {
+        const parsed = JSON.parse(currentUserRaw)
+        if (parsed && typeof parsed.id === "string") {
+          userId = parsed.id
+        }
+      } catch (err) {
+        console.error("Failed to parse current user info", err)
+      }
+    }
+
     const newRating = {
       id: crypto.randomUUID(),
+      userId,
       photo,
       location,
       ratings,

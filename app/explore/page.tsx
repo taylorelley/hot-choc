@@ -66,7 +66,6 @@ export default function ExplorePage() {
 
     // In a real app this would fetch community data from the API
     setCommunityRatings([])
-    setTopUsers([])
   }, [])
 
   const getAverageRating = (ratings: CommunityRating['ratings']) => {

@@ -36,7 +36,18 @@ export default function HomePage() {
     setTimeout(() => {
       const savedRatings = localStorage.getItem("hotChocRatings")
       if (savedRatings) {
-        setRatings(JSON.parse(savedRatings))
+        try {
+          const parsed = JSON.parse(savedRatings)
+          if (Array.isArray(parsed)) {
+            setRatings(parsed)
+          } else {
+            console.error("Invalid ratings format in localStorage")
+            setRatings([])
+          }
+        } catch (err) {
+          console.error("Failed to parse saved ratings", err)
+          setRatings([])
+        }
       }
       setIsLoading(false)
     }, 800)

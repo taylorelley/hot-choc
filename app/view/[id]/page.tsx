@@ -34,7 +34,20 @@ export default function RatingDetailPage() {
 
   useEffect(() => {
     setTimeout(() => {
-      const savedRatings = JSON.parse(localStorage.getItem("hotChocRatings") || "[]")
+      let savedRatings: any[] = []
+      try {
+        const raw = localStorage.getItem("hotChocRatings")
+        if (raw) {
+          const parsed = JSON.parse(raw)
+          if (Array.isArray(parsed)) {
+            savedRatings = parsed
+          } else {
+            console.error("Invalid ratings format in localStorage")
+          }
+        }
+      } catch (err) {
+        console.error("Failed to parse saved ratings", err)
+      }
       const foundRating = savedRatings.find((r: Rating) => r.id === params.id)
       setRating(foundRating || null)
       setIsLoading(false)

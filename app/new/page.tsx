@@ -4,7 +4,7 @@ import type React from "react"
 import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Camera, MapPin, Save, Sparkles, Zap, CheckCircle } from "lucide-react"
-import Image from "next/image"
+import NextImage from "next/image"
 
 interface RatingData {
   temperature: number
@@ -39,12 +39,39 @@ export default function NewRatingPage() {
   const [currentStep, setCurrentStep] = useState(1)
   const [showSuccess, setShowSuccess] = useState(false)
 
+  const compressImage = (
+    dataUrl: string,
+    maxSize = 1000,
+    quality = 0.7,
+  ): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement("canvas")
+        const scale = Math.min(maxSize / img.width, maxSize / img.height, 1)
+        canvas.width = img.width * scale
+        canvas.height = img.height * scale
+        const ctx = canvas.getContext("2d")
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+          resolve(canvas.toDataURL("image/jpeg", quality))
+        } else {
+          resolve(dataUrl)
+        }
+      }
+      img.onerror = () => resolve(dataUrl)
+      img.src = dataUrl
+    })
+  }
+
   const handlePhotoCapture = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
       const reader = new FileReader()
-      reader.onload = (e) => {
-        setPhoto(e.target?.result as string)
+      reader.onload = async (e) => {
+        const raw = e.target?.result as string
+        const compressed = await compressImage(raw)
+        setPhoto(compressed)
         setCurrentStep(2)
       }
       reader.readAsDataURL(file)
@@ -86,12 +113,28 @@ export default function NewRatingPage() {
     }
 
     setIsSaving(true)
+    let errorMessage = ''
 
     // Simulate API call delay for better UX
     await new Promise((resolve) => setTimeout(resolve, 1500))
 
+    const currentUserRaw = localStorage.getItem("currentUser")
+    let userId: string | undefined
+    if (currentUserRaw) {
+      try {
+        const parsed = JSON.parse(currentUserRaw)
+        if (parsed && typeof parsed.id === "string") {
+          userId = parsed.id
+        }
+      } catch (err) {
+        console.error("Failed to parse current user info", err)
+        errorMessage = 'Failed to read user information.'
+      }
+    }
+
     const newRating = {
       id: crypto.randomUUID(),
+      userId,
       photo,
       location,
       ratings,
@@ -99,16 +142,48 @@ export default function NewRatingPage() {
       timestamp: new Date().toISOString(),
     }
 
-    const existingRatings = JSON.parse(localStorage.getItem("hotChocRatings") || "[]")
+    let existingRatings: any[] = []
+    try {
+      const stored = localStorage.getItem("hotChocRatings")
+      if (stored) {
+        existingRatings = JSON.parse(stored)
+        if (!Array.isArray(existingRatings)) {
+          existingRatings = []
+        }
+      }
+    } catch (err) {
+      console.error("Failed to read ratings from localStorage", err)
+      errorMessage = 'Failed to read saved ratings.'
+      existingRatings = []
+    }
+
     const updatedRatings = [newRating, ...existingRatings]
-    localStorage.setItem("hotChocRatings", JSON.stringify(updatedRatings))
+
+    try {
+      localStorage.setItem("hotChocRatings", JSON.stringify(updatedRatings))
+    } catch (err: any) {
+      console.error("Failed to save rating", err)
+      if (
+        err?.name === "QuotaExceededError" ||
+        err?.name === "NS_ERROR_DOM_QUOTA_REACHED"
+      ) {
+        errorMessage =
+          "Storage limit reached. Please remove old ratings or use smaller photos."
+      } else {
+        errorMessage = "Failed to save rating."
+      }
+    }
 
     setIsSaving(false)
-    setShowSuccess(true)
+    if (errorMessage) {
+      alert(errorMessage)
+    } else {
+      setShowSuccess(true)
 
-    setTimeout(() => {
-      router.push("/")
-    }, 2000)
+      setTimeout(() => {
+        router.push("/")
+      }, 2000)
+    }
   }
 
   const ratingLabels = {
@@ -175,7 +250,7 @@ export default function NewRatingPage() {
 
             {photo ? (
               <div className="relative group">
-                <Image
+                <NextImage
                   src={photo || "/placeholder.svg"}
                   alt="Hot chocolate"
                   width={400}

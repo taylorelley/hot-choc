@@ -1,18 +1,21 @@
+import React from 'react'
 import { render, screen } from '@testing-library/react'
 import Navbar from '../components/navbar'
 import '@testing-library/jest-dom'
 
 jest.mock('next/link', () => {
-  return ({ children, href }) => <a href={href}>{children}</a>
+  return ({ children, href }: { children: React.ReactNode; href: string }) => (
+    <a href={href}>{children}</a>
+  )
 })
 
-jest.mock('next/image', () => (props) => {
+jest.mock('next/image', () => (props: any) => {
   return <img {...props} />
 })
 
 jest.mock('lucide-react', () => {
   const React = require('react')
-  return new Proxy({}, { get: () => (props) => <svg {...props} /> })
+  return new Proxy({}, { get: () => (props: any) => <svg {...props} /> })
 })
 
 const push = jest.fn()

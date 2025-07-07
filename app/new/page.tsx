@@ -99,9 +99,27 @@ export default function NewRatingPage() {
       timestamp: new Date().toISOString(),
     }
 
-    const existingRatings = JSON.parse(localStorage.getItem("hotChocRatings") || "[]")
+    let existingRatings: any[] = []
+    try {
+      const stored = localStorage.getItem("hotChocRatings")
+      if (stored) {
+        existingRatings = JSON.parse(stored)
+        if (!Array.isArray(existingRatings)) {
+          existingRatings = []
+        }
+      }
+    } catch (err) {
+      console.error("Failed to read ratings from localStorage", err)
+      existingRatings = []
+    }
+
     const updatedRatings = [newRating, ...existingRatings]
-    localStorage.setItem("hotChocRatings", JSON.stringify(updatedRatings))
+
+    try {
+      localStorage.setItem("hotChocRatings", JSON.stringify(updatedRatings))
+    } catch (err) {
+      console.error("Failed to save rating", err)
+    }
 
     setIsSaving(false)
     setShowSuccess(true)

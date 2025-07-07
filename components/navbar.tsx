@@ -245,24 +245,6 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Top Notification Bar (when logged in) */}
-      {user && pathname === "/dashboard" && (
-        <div className="fixed top-0 left-0 right-0 z-40 px-4 pt-4">
-          <div className="max-w-md mx-auto">
-            <div className="bg-gradient-to-r from-amber-500/90 to-orange-500/90 backdrop-blur-xl text-white rounded-2xl p-3 shadow-lg">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Bell className="w-5 h-5" />
-                  <span className="text-sm font-medium">Welcome back, {user.name.split(" ")[0]}!</span>
-                </div>
-                <button className="text-white/80 hover:text-white transition-colors">
-                  <span className="text-xs">Dismiss</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Floating Action Button (alternative design for new rating) */}
       {user && !pathname.includes("/new") && (

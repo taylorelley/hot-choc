@@ -163,7 +163,7 @@ export default function DashboardPage() {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-rose-200/20 to-pink-300/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
       </div>
 
-      <div className="relative max-w-md mx-auto px-4 pt-20 pb-6">
+      <div className="relative max-w-md mx-auto px-4 py-6">
         {/* Welcome Header */}
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold bg-gradient-to-r from-amber-800 to-orange-700 bg-clip-text text-transparent mb-2">

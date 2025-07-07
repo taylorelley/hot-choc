@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
+import { fetchRatings } from '../../lib/api'
 import {
   Star,
   MapPin,
@@ -67,77 +68,60 @@ export default function DashboardPage() {
     const userData = JSON.parse(currentUser)
     setUser(userData)
 
-    // Load user's ratings
-    let allRatings: any[] = []
-    try {
-      const raw = localStorage.getItem("hotChocRatings")
-      if (raw) {
-        const parsed = JSON.parse(raw)
-        if (Array.isArray(parsed)) {
-          allRatings = parsed
+    fetchRatings()
+      .then((all) => {
+        localStorage.setItem('hotChocRatings', JSON.stringify(all))
+        const userRatings = all.filter((r: Rating) => r.userId === userData.id)
+        setRatings(userRatings)
+
+        let updatedUser
+        if (userRatings.length > 0) {
+          const avgRating =
+            userRatings.reduce((sum: number, r: Rating) => {
+              const ratingValues = Object.values(r.ratings)
+              const ratingAvg =
+                ratingValues.reduce((s, v) => s + v, 0) / ratingValues.length
+              return sum + ratingAvg
+            }, 0) / userRatings.length
+
+          const locations = [
+            ...new Set(userRatings.map((r: Rating) => r.location.name)),
+          ]
+          const locationCounts = locations.map((loc) => ({
+            location: loc,
+            count: userRatings.filter((r: Rating) => r.location.name === loc)
+              .length,
+          }))
+          const favoriteLocation =
+            locationCounts.sort((a, b) => b.count - a.count)[0]?.location || ''
+
+          updatedUser = {
+            ...userData,
+            stats: {
+              totalRatings: userRatings.length,
+              averageRating: Number(avgRating.toFixed(1)),
+              favoriteLocation,
+              totalLocations: locations.length,
+            },
+          }
         } else {
-          console.error("Invalid ratings format in localStorage")
+          updatedUser = {
+            ...userData,
+            stats: {
+              totalRatings: 0,
+              averageRating: 0,
+              favoriteLocation: '',
+              totalLocations: 0,
+            },
+          }
         }
-      }
-    } catch (err) {
-      console.error("Failed to parse saved ratings", err)
-    }
-    const userRatings = allRatings.filter(
-      (r: Rating) => r.userId === userData.id,
-    )
-    setRatings(userRatings)
 
-    // Update user stats
-    if (userRatings.length > 0) {
-      const avgRating =
-        userRatings.reduce((sum: number, r: Rating) => {
-          const ratingValues = Object.values(r.ratings)
-          const ratingAvg =
-            ratingValues.reduce((s, v) => s + v, 0) / ratingValues.length
-          return sum + ratingAvg
-        }, 0) / userRatings.length
-
-      const locations = [
-        ...new Set(userRatings.map((r: Rating) => r.location.name)),
-      ]
-      const locationCounts = locations.map((loc) => ({
-        location: loc,
-        count: userRatings.filter((r: Rating) => r.location.name === loc)
-          .length,
-      }))
-      const favoriteLocation =
-        locationCounts.sort((a, b) => b.count - a.count)[0]?.location || ''
-
-      const updatedUser = {
-        ...userData,
-        stats: {
-          totalRatings: userRatings.length,
-          averageRating: Number(avgRating.toFixed(1)),
-          favoriteLocation,
-          totalLocations: locations.length,
-        },
-      }
-
-      setUser(updatedUser)
-      localStorage.setItem('currentUser', JSON.stringify(updatedUser))
-    } else {
-      const updatedUser = {
-        ...userData,
-        stats: {
-          totalRatings: 0,
-          averageRating: 0,
-          favoriteLocation: '',
-          totalLocations: 0,
-        },
-      }
-
-      setUser(updatedUser)
-      localStorage.setItem('currentUser', JSON.stringify(updatedUser))
-    }
-
-    // In a real app this would fetch data from the API
-    setRecentActivity([])
-    setAchievements([])
+        setUser(updatedUser)
+        localStorage.setItem('currentUser', JSON.stringify(updatedUser))
+        setRecentActivity([])
+        setAchievements([])
+      })
+      .catch((err) => console.error('Failed to load ratings', err))
   }, [router])
 
   const getAverageRating = (ratingObj: Rating['ratings']) => {

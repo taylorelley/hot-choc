@@ -4,101 +4,113 @@ const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
-const fs = require('fs')
 const path = require('path')
+const Database = require('better-sqlite3')
 
-const PORT = process.env.PORT || 3001;
-const SECRET = process.env.JWT_SECRET || 'changeme';
+const PORT = process.env.PORT || 3001
+const SECRET = process.env.JWT_SECRET || 'changeme'
+const DB_FILE = process.env.DB_FILE || path.join(__dirname, 'db.sqlite')
 
-const app = express();
-app.use(cors());
-app.use(bodyParser.json());
+const db = new Database(DB_FILE)
 
-// HTTP request logging
+db.prepare(
+  `CREATE TABLE IF NOT EXISTS users (
+    id TEXT PRIMARY KEY,
+    name TEXT,
+    email TEXT UNIQUE,
+    password TEXT
+  )`,
+).run()
+
+db.prepare(
+  `CREATE TABLE IF NOT EXISTS ratings (
+    id TEXT PRIMARY KEY,
+    userId TEXT,
+    data TEXT
+  )`,
+).run()
+
+const app = express()
+app.use(cors())
+app.use(bodyParser.json())
 app.use(morgan('combined'))
 
-const dataFile = process.env.DATA_FILE || path.join(__dirname, 'data.json')
-let data = { users: [], ratings: [] };
-if (fs.existsSync(dataFile)) {
-  data = JSON.parse(fs.readFileSync(dataFile));
-}
-
-function saveData() {
-  fs.writeFileSync(dataFile, JSON.stringify(data, null, 2));
-}
-
 function authMiddleware(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ message: 'Missing token' });
-  const token = authHeader.split(' ')[1];
+  const authHeader = req.headers.authorization
+  if (!authHeader) return res.status(401).json({ message: 'Missing token' })
+  const token = authHeader.split(' ')[1]
   try {
-    const decoded = jwt.verify(token, SECRET);
-    req.user = decoded;
-    next();
-  } catch (err) {
-    res.status(401).json({ message: 'Invalid token' });
+    req.user = jwt.verify(token, SECRET)
+    next()
+  } catch {
+    res.status(401).json({ message: 'Invalid token' })
   }
 }
 
 app.post('/api/register', async (req, res) => {
-  const { name, email, password } = req.body;
-  console.log('Register request', email)
-  if (!name || !email || !password) return res.status(400).json({ message: 'Missing fields' });
-  if (data.users.find(u => u.email === email)) return res.status(400).json({ message: 'Email exists' });
-  const hashed = await bcrypt.hash(password, 10);
-  const user = { id: Date.now().toString(), name, email, password: hashed };
-  data.users.push(user);
-  saveData();
-  res.json({ id: user.id, name: user.name, email: user.email });
-});
+  const { name, email, password } = req.body
+  if (!name || !email || !password)
+    return res.status(400).json({ message: 'Missing fields' })
+  if (db.prepare('SELECT id FROM users WHERE email = ?').get(email))
+    return res.status(400).json({ message: 'Email exists' })
+  const hashed = await bcrypt.hash(password, 10)
+  const id = Date.now().toString()
+  db.prepare('INSERT INTO users (id,name,email,password) VALUES (?,?,?,?)').run(
+    id,
+    name,
+    email,
+    hashed,
+  )
+  res.json({ id, name, email })
+})
 
 app.post('/api/login', async (req, res) => {
-  const { email, password } = req.body;
-  console.log('Login attempt', email)
-  const user = data.users.find(u => u.email === email);
-  if (!user) return res.status(400).json({ message: 'Invalid credentials' });
-  const match = await bcrypt.compare(password, user.password);
-  if (!match) return res.status(400).json({ message: 'Invalid credentials' });
+  const { email, password } = req.body
+  const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email)
+  if (!user) return res.status(400).json({ message: 'Invalid credentials' })
+  const match = await bcrypt.compare(password, user.password)
+  if (!match) return res.status(400).json({ message: 'Invalid credentials' })
   const token = jwt.sign({ id: user.id, email: user.email }, SECRET, {
     expiresIn: '7d',
-  });
-  res.json({ token, user: { id: user.id, name: user.name, email: user.email } });
-});
+  })
+  res.json({ token, user: { id: user.id, name: user.name, email: user.email } })
+})
 
 app.get('/api/ratings', (req, res) => {
-  console.log('List ratings');
-  res.json(data.ratings);
-});
+  const rows = db.prepare('SELECT data FROM ratings').all()
+  res.json(rows.map((r) => JSON.parse(r.data)))
+})
 
 app.post('/api/ratings', authMiddleware, (req, res) => {
-  console.log('Create rating by user', req.user.email);
-  const rating = { id: Date.now().toString(), userId: req.user.id, ...req.body };
-  data.ratings.push(rating);
-  saveData();
-  res.json(rating);
-});
+  const rating = { id: Date.now().toString(), userId: req.user.id, ...req.body }
+  db.prepare('INSERT INTO ratings (id,userId,data) VALUES (?,?,?)').run(
+    rating.id,
+    rating.userId,
+    JSON.stringify(rating),
+  )
+  res.json(rating)
+})
 
 app.get('/api/ratings/:id', (req, res) => {
-  console.log('Get rating', req.params.id);
-  const rating = data.ratings.find(r => r.id === req.params.id);
-  if (!rating) return res.status(404).json({ message: 'Not found' });
-  res.json(rating);
-});
+  const row = db
+    .prepare('SELECT data FROM ratings WHERE id = ?')
+    .get(req.params.id)
+  if (!row) return res.status(404).json({ message: 'Not found' })
+  res.json(JSON.parse(row.data))
+})
 
 app.delete('/api/ratings/:id', authMiddleware, (req, res) => {
-  console.log('Delete rating', req.params.id, 'by user', req.user.email);
-  const index = data.ratings.findIndex(r => r.id === req.params.id);
-  if (index === -1) return res.status(404).json({ message: 'Not found' });
-  const rating = data.ratings[index];
-  if (rating.userId && rating.userId !== req.user.id) {
-    return res.status(403).json({ message: 'Forbidden' });
-  }
-  data.ratings.splice(index, 1);
-  saveData();
-  res.json({ message: 'Deleted' });
-});
+  const row = db
+    .prepare('SELECT data FROM ratings WHERE id = ?')
+    .get(req.params.id)
+  if (!row) return res.status(404).json({ message: 'Not found' })
+  const rating = JSON.parse(row.data)
+  if (rating.userId && rating.userId !== req.user.id)
+    return res.status(403).json({ message: 'Forbidden' })
+  db.prepare('DELETE FROM ratings WHERE id = ?').run(req.params.id)
+  res.json({ message: 'Deleted' })
+})
 
-// Generic error handler so stack traces appear in logs
 app.use((err, req, res, next) => {
   console.error('Unhandled error', err)
   res.status(500).json({ message: 'Server error' })
@@ -106,7 +118,7 @@ app.use((err, req, res, next) => {
 
 if (require.main === module) {
   app.listen(PORT, () =>
-    console.log(`API running on port ${PORT} using ${dataFile}`),
+    console.log(`API running on port ${PORT} using ${DB_FILE}`),
   )
 }
 

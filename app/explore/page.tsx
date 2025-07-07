@@ -12,6 +12,7 @@ import {
   CircleUserRound,
 } from 'lucide-react'
 import dynamic from 'next/dynamic'
+import { fetchRatings } from '../../lib/api'
 
 interface User {
   id: string
@@ -88,8 +89,9 @@ export default function ExplorePage() {
       setCurrentUser(JSON.parse(user))
     }
 
-    // In a real app this would fetch community data from the API
-    setCommunityRatings([])
+    fetchRatings()
+      .then((data) => setCommunityRatings(data))
+      .catch((err) => console.error('Failed to load ratings', err))
     setTopUsers([])
 
     // Load ratings saved locally

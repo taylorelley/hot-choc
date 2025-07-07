@@ -2,13 +2,13 @@
 const request = require('supertest')
 const path = require('path')
 
-process.env.DATA_FILE = path.join(__dirname, 'test_data.json')
+process.env.DB_FILE = path.join(__dirname, 'test.db')
 const app = require('../server/index')
 const fs = require('fs')
 
 afterAll(() => {
-  if (fs.existsSync(process.env.DATA_FILE)) {
-    fs.unlinkSync(process.env.DATA_FILE)
+  if (fs.existsSync(process.env.DB_FILE)) {
+    fs.unlinkSync(process.env.DB_FILE)
   }
 })
 
@@ -27,7 +27,11 @@ describe('server api', () => {
       .send({ email: user.email, password: user.password })
     expect(res.status).toBe(200)
     expect(res.body.token).toBeDefined()
-    expect(res.body.user).toEqual({ id: expect.any(String), name: 'Test', email: user.email })
+    expect(res.body.user).toEqual({
+      id: expect.any(String),
+      name: 'Test',
+      email: user.email,
+    })
   })
 
   test('create and delete rating', async () => {

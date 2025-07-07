@@ -1,9 +1,10 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import { MapPin, Calendar, Star, Search, Sparkles } from "lucide-react"
-import Link from "next/link"
-import Image from "next/image"
+import { useState, useEffect } from 'react'
+import { MapPin, Calendar, Star, Search, Sparkles } from 'lucide-react'
+import Link from 'next/link'
+import Image from 'next/image'
+import { fetchRatings } from '../lib/api'
 
 interface Rating {
   id: string
@@ -28,29 +29,20 @@ interface Rating {
 export default function HomePage() {
   const [ratings, setRatings] = useState<Rating[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState('')
   const [showSearch, setShowSearch] = useState(false)
 
   useEffect(() => {
-    // Simulate loading for better UX
-    setTimeout(() => {
-      const savedRatings = localStorage.getItem("hotChocRatings")
-      if (savedRatings) {
-        try {
-          const parsed = JSON.parse(savedRatings)
-          if (Array.isArray(parsed)) {
-            setRatings(parsed)
-          } else {
-            console.error("Invalid ratings format in localStorage")
-            setRatings([])
-          }
-        } catch (err) {
-          console.error("Failed to parse saved ratings", err)
-          setRatings([])
-        }
-      }
-      setIsLoading(false)
-    }, 800)
+    fetchRatings()
+      .then((data) => {
+        setRatings(data)
+        localStorage.setItem('hotChocRatings', JSON.stringify(data))
+      })
+      .catch((err) => {
+        console.error('Failed to load ratings', err)
+        setRatings([])
+      })
+      .finally(() => setIsLoading(false))
   }, [])
 
   const formatDate = (timestamp: string) => {
@@ -59,20 +51,22 @@ export default function HomePage() {
     const diffTime = Math.abs(now.getTime() - date.getTime())
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 
-    if (diffDays === 1) return "Today"
-    if (diffDays === 2) return "Yesterday"
+    if (diffDays === 1) return 'Today'
+    if (diffDays === 2) return 'Yesterday'
     if (diffDays <= 7) return `${diffDays - 1} days ago`
 
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: date.getFullYear() !== now.getFullYear() ? "numeric" : undefined,
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
     })
   }
 
-  const getAverageRating = (ratingObj: Rating["ratings"]) => {
+  const getAverageRating = (ratingObj: Rating['ratings']) => {
     const values = Object.values(ratingObj)
-    return (values.reduce((sum, val) => sum + val, 0) / values.length).toFixed(1)
+    return (values.reduce((sum, val) => sum + val, 0) / values.length).toFixed(
+      1,
+    )
   }
 
   const filteredRatings = ratings.filter(
@@ -112,7 +106,9 @@ export default function HomePage() {
                 height={517}
                 className="h-24 w-auto mx-auto mb-2"
               />
-              <p className="text-amber-700/80">Discover & rate amazing hot chocolates</p>
+              <p className="text-amber-700/80">
+                Discover & rate amazing hot chocolates
+              </p>
             </div>
             <button
               onClick={() => setShowSearch(!showSearch)}
@@ -124,7 +120,7 @@ export default function HomePage() {
 
           {/* Search Bar */}
           <div
-            className={`transition-all duration-500 ease-out ${showSearch ? "max-h-20 opacity-100 mb-4" : "max-h-0 opacity-0"} overflow-hidden`}
+            className={`transition-all duration-500 ease-out ${showSearch ? 'max-h-20 opacity-100 mb-4' : 'max-h-0 opacity-0'} overflow-hidden`}
           >
             <div className="relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-amber-600" />
@@ -143,17 +139,22 @@ export default function HomePage() {
         {!isLoading && ratings.length > 0 && (
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 text-center shadow-lg">
-              <div className="text-2xl font-bold text-amber-800">{ratings.length}</div>
+              <div className="text-2xl font-bold text-amber-800">
+                {ratings.length}
+              </div>
               <div className="text-sm text-amber-600">Total Ratings</div>
             </div>
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 text-center shadow-lg">
               <div className="text-2xl font-bold text-amber-800">
                 {ratings.length > 0
                   ? (
-                      ratings.reduce((sum, r) => sum + Number.parseFloat(getAverageRating(r.ratings)), 0) /
-                      ratings.length
+                      ratings.reduce(
+                        (sum, r) =>
+                          sum + Number.parseFloat(getAverageRating(r.ratings)),
+                        0,
+                      ) / ratings.length
                     ).toFixed(1)
-                  : "0.0"}
+                  : '0.0'}
               </div>
               <div className="text-sm text-amber-600">Avg Rating</div>
             </div>
@@ -173,12 +174,12 @@ export default function HomePage() {
                 <Sparkles className="absolute top-2 right-8 w-6 h-6 text-amber-400 animate-pulse" />
               </div>
               <h3 className="text-xl font-semibold text-amber-900 mb-2">
-                {searchQuery ? "No matches found" : "No ratings yet"}
+                {searchQuery ? 'No matches found' : 'No ratings yet'}
               </h3>
               <p className="text-amber-700 mb-8 max-w-xs mx-auto">
                 {searchQuery
-                  ? "Try adjusting your search terms"
-                  : "Start your hot chocolate journey by rating your first cup!"}
+                  ? 'Try adjusting your search terms'
+                  : 'Start your hot chocolate journey by rating your first cup!'}
               </p>
               {!searchQuery && (
                 <Link href="/new">
@@ -196,12 +197,14 @@ export default function HomePage() {
                   className="group bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl p-4 flex gap-4 transition-all duration-300 hover:scale-[1.02] hover:bg-white/90 border border-white/20"
                   style={{
                     animationDelay: `${index * 100}ms`,
-                    animation: isLoading ? "none" : "slideInUp 0.6s ease-out forwards",
+                    animation: isLoading
+                      ? 'none'
+                      : 'slideInUp 0.6s ease-out forwards',
                   }}
                 >
                   <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
                     <Image
-                      src={rating.photo || "/placeholder.svg"}
+                      src={rating.photo || '/placeholder.svg'}
                       alt="Hot chocolate"
                       width={64}
                       height={64}
@@ -213,16 +216,23 @@ export default function HomePage() {
                     <div className="flex items-center gap-2 mb-2">
                       <div className="flex items-center gap-1">
                         <Star className="w-4 h-4 text-amber-500 fill-current" />
-                        <span className="font-bold text-amber-900 text-lg">{getAverageRating(rating.ratings)}</span>
+                        <span className="font-bold text-amber-900 text-lg">
+                          {getAverageRating(rating.ratings)}
+                        </span>
                       </div>
                       <div className="flex gap-1">
                         {Array.from({ length: 5 }).map((_, i) => (
                           <div
                             key={i}
                             className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                              i < Math.round(Number.parseFloat(getAverageRating(rating.ratings)))
-                                ? "bg-amber-400"
-                                : "bg-amber-200"
+                              i <
+                              Math.round(
+                                Number.parseFloat(
+                                  getAverageRating(rating.ratings),
+                                ),
+                              )
+                                ? 'bg-amber-400'
+                                : 'bg-amber-200'
                             }`}
                           />
                         ))}
@@ -230,7 +240,9 @@ export default function HomePage() {
                     </div>
                     <div className="flex items-center gap-1 text-sm text-gray-600 mb-1">
                       <MapPin className="w-3 h-3 text-amber-500" />
-                      <span className="truncate font-medium">{rating.location.name}</span>
+                      <span className="truncate font-medium">
+                        {rating.location.name}
+                      </span>
                     </div>
                     <div className="flex items-center gap-1 text-sm text-gray-500 mb-2">
                       <Calendar className="w-3 h-3" />

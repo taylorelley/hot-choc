@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
-import { Home, Plus, Search, User, Coffee, Bell, LogIn, UserPlus, Compass, type LucideIcon } from "lucide-react"
+import { Star, Plus, Search, User, Coffee, Bell, LogIn, UserPlus, Compass, type LucideIcon } from "lucide-react"
 
 interface NavbarUser {
   id: string
@@ -74,11 +74,11 @@ export default function Navbar() {
           isActive: pathname === "/explore",
         },
         {
-          id: "dashboard",
-          label: "Dashboard",
-          icon: Coffee,
-          href: "/dashboard",
-          isActive: pathname === "/dashboard",
+          id: "ratings",
+          label: "Ratings",
+          icon: Star,
+          href: "/",
+          isActive: pathname === "/",
         },
         {
           id: "new",
@@ -89,15 +89,15 @@ export default function Navbar() {
           isSpecial: true, // This will be the main CTA button
         },
         {
-          id: "home",
-          label: "Home",
-          icon: Home,
-          href: "/",
-          isActive: pathname === "/",
+          id: "dashboard",
+          label: "Dashboard",
+          icon: Coffee,
+          href: "/dashboard",
+          isActive: pathname === "/dashboard",
         },
         {
-          id: "profile",
-          label: "Profile",
+          id: "settings",
+          label: "Settings",
           icon: User,
           href: "/profile/settings",
           isActive: pathname.startsWith("/profile"),
@@ -113,9 +113,9 @@ export default function Navbar() {
           isActive: pathname === "/explore",
         },
         {
-          id: "home",
-          label: "Home",
-          icon: Home,
+          id: "ratings",
+          label: "Ratings",
+          icon: Star,
           href: "/",
           isActive: pathname === "/",
         },
@@ -144,7 +144,10 @@ export default function Navbar() {
       >
         <div className="max-w-md mx-auto">
           <div className="bg-white/80 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-2">
-            <div className="flex items-center justify-between">
+            <div
+              className="grid"
+              style={{ gridTemplateColumns: `repeat(${navItems.length}, minmax(0, 1fr))` }}
+            >
               {navItems.map((item) => {
                 const Icon = item.icon
 

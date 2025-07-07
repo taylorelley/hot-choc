@@ -1,6 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const morgan = require('morgan')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const fs = require('fs')
@@ -13,16 +14,8 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// Basic request/response logging to help debug API calls
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`)
-  res.on('finish', () => {
-    console.log(
-      `[${new Date().toISOString()}] ${res.statusCode} ${req.method} ${req.url}`,
-    )
-  })
-  next()
-})
+// HTTP request logging
+app.use(morgan('combined'))
 
 const dataFile = process.env.DATA_FILE || path.join(__dirname, 'data.json')
 let data = { users: [], ratings: [] };
@@ -94,7 +87,9 @@ app.use((err, req, res, next) => {
 })
 
 if (require.main === module) {
-  app.listen(PORT, () => console.log(`API running on port ${PORT}`))
+  app.listen(PORT, () =>
+    console.log(`API running on port ${PORT} using ${dataFile}`),
+  )
 }
 
 module.exports = app

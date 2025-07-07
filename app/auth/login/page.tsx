@@ -24,6 +24,7 @@ export default function LoginPage() {
     e.preventDefault()
     setIsLoading(true)
     setError('')
+    console.log('Sending login request to', `${API_URL}/api/login`)
 
     try {
       const res = await fetch(`${API_URL}/api/login`, {
@@ -48,6 +49,7 @@ export default function LoginPage() {
       )
       router.push('/dashboard')
     } catch (err: any) {
+      console.error('Login failed', err)
       setError(err.message || 'Invalid email or password')
     } finally {
       setIsLoading(false)

@@ -40,6 +40,7 @@ export default function SignUpPage() {
     e.preventDefault()
     setIsLoading(true)
     setError('')
+    console.log('Sending signup request to', `${API_URL}/api/register`)
 
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords don't match")
@@ -67,7 +68,9 @@ export default function SignUpPage() {
       localStorage.setItem('currentUser', JSON.stringify(newUser))
       router.push('/onboarding')
     } catch (err: any) {
+      console.error('Registration failed', err)
       setError(err.message || 'Registration failed')
+    } finally {
       setIsLoading(false)
     }
   }

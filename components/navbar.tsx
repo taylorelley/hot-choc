@@ -200,7 +200,7 @@ export default function Navbar() {
                               role="img"
                               aria-label="No avatar"
                             >
-                              👤
+                              🙂
                             </span>
                           )}
                           {item.isActive && (

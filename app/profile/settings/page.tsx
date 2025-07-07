@@ -186,7 +186,7 @@ export default function SettingsPage() {
                       role="img"
                       aria-label="No avatar"
                     >
-                      👤
+                      🙂
                     </span>
                   )}
                   <button

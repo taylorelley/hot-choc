@@ -301,7 +301,7 @@ export default function ExplorePage() {
                         role="img"
                         aria-label="No avatar"
                       >
-                        👤
+                        🙂
                       </span>
                     )}
                     <div>

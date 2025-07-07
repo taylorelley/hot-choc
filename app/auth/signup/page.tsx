@@ -147,7 +147,7 @@ export default function SignUpPage() {
                             role="img"
                             aria-label="No avatar"
                           >
-                            👤
+                            🙂
                           </span>
                         )}
                       </div>

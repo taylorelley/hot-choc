@@ -68,9 +68,20 @@ export default function DashboardPage() {
     setUser(userData)
 
     // Load user's ratings
-    const allRatings = JSON.parse(
-      localStorage.getItem('hotChocRatings') || '[]',
-    )
+    let allRatings: any[] = []
+    try {
+      const raw = localStorage.getItem("hotChocRatings")
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        if (Array.isArray(parsed)) {
+          allRatings = parsed
+        } else {
+          console.error("Invalid ratings format in localStorage")
+        }
+      }
+    } catch (err) {
+      console.error("Failed to parse saved ratings", err)
+    }
     const userRatings = allRatings.filter(
       (r: Rating) => r.userId === userData.id,
     )

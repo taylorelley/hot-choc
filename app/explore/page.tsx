@@ -7,8 +7,7 @@ import {
   Filter,
   Star,
   MapPin,
-  Users,
-  TrendingUp,
+  Map,
   Heart,
   CircleUserRound,
 } from 'lucide-react'
@@ -48,7 +47,7 @@ interface CommunityRating {
 }
 
 export default function ExplorePage() {
-  const [activeTab, setActiveTab] = useState('community')
+  const [activeTab, setActiveTab] = useState('nearby')
   const [searchQuery, setSearchQuery] = useState('')
   const [communityRatings, setCommunityRatings] = useState<CommunityRating[]>(
     [],
@@ -153,32 +152,32 @@ export default function ExplorePage() {
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-2 mb-6">
           <div className="grid grid-cols-2 gap-1">
             <button
-              onClick={() => setActiveTab('community')}
+              onClick={() => setActiveTab('nearby')}
               className={`p-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 ${
-                activeTab === 'community'
+                activeTab === 'nearby'
                   ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg'
                   : 'text-amber-700 hover:bg-amber-50'
               }`}
             >
-              <TrendingUp className="w-4 h-4" />
-              <span className="font-medium">Community</span>
+              <MapPin className="w-4 h-4" />
+              <span className="font-medium">Nearby</span>
             </button>
             <button
-              onClick={() => setActiveTab('users')}
+              onClick={() => setActiveTab('map')}
               className={`p-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 ${
-                activeTab === 'users'
+                activeTab === 'map'
                   ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg'
                   : 'text-amber-700 hover:bg-amber-50'
               }`}
             >
-              <Users className="w-4 h-4" />
-              <span className="font-medium">Top Users</span>
+              <Map className="w-4 h-4" />
+              <span className="font-medium">Map</span>
             </button>
           </div>
         </div>
 
         {/* Tab Content */}
-        {activeTab === 'community' && (
+        {activeTab === 'nearby' && (
           <div className="space-y-6">
             {communityRatings.map((rating) => (
               <div
@@ -279,7 +278,7 @@ export default function ExplorePage() {
           </div>
         )}
 
-        {activeTab === 'users' && (
+        {activeTab === 'map' && (
           <div className="space-y-4">
             {topUsers.map((user) => (
               <div

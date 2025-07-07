@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Camera, MapPin, Save, Sparkles, Zap, CheckCircle } from "lucide-react"
 import NextImage from "next/image"
@@ -38,6 +38,42 @@ export default function NewRatingPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
   const [showSuccess, setShowSuccess] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [suggestions, setSuggestions] = useState<{ name: string; lat: number; lon: number }[]>([])
+
+  useEffect(() => {
+    if (searchQuery.trim().length < 3) {
+      setSuggestions([])
+      return
+    }
+    const controller = new AbortController()
+    const timer = setTimeout(async () => {
+      try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`
+        const res = await fetch(url, {
+          signal: controller.signal,
+          headers: { 'Accept-Language': 'en' },
+        })
+        if (!res.ok) throw new Error('Failed to fetch')
+        const data = await res.json()
+        setSuggestions(
+          (data as any[]).slice(0, 5).map((item) => ({
+            name: item.display_name as string,
+            lat: parseFloat(item.lat),
+            lon: parseFloat(item.lon),
+          }))
+        )
+      } catch (err: any) {
+        if (err.name !== 'AbortError') {
+          console.error('Search failed', err)
+        }
+      }
+    }, 500)
+    return () => {
+      controller.abort()
+      clearTimeout(timer)
+    }
+  }, [searchQuery])
 
   const compressImage = (
     dataUrl: string,
@@ -344,9 +380,12 @@ export default function NewRatingPage() {
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="Or enter location manually..."
-                  value={location.name}
-                  onChange={(e) => setLocation((prev) => ({ ...prev, name: e.target.value }))}
+                  placeholder="Search address or cafe..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value)
+                    setLocation((prev) => ({ ...prev, name: e.target.value }))
+                  }}
                   className="w-full p-4 border border-amber-200/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400/50 focus:border-transparent transition-all duration-300 bg-white/50 backdrop-blur-sm"
                   onFocus={() => setCurrentStep(Math.max(currentStep, 3))}
                 />
@@ -354,6 +393,24 @@ export default function NewRatingPage() {
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
                     <CheckCircle className="w-5 h-5 text-green-500" />
                   </div>
+                )}
+                {suggestions.length > 0 && (
+                  <ul className="absolute z-10 mt-1 left-0 right-0 bg-white rounded-xl border shadow-lg max-h-60 overflow-auto">
+                    {suggestions.map((s) => (
+                      <li
+                        key={`${s.lat}-${s.lon}`}
+                        onClick={() => {
+                          setLocation({ lat: s.lat, lng: s.lon, name: s.name })
+                          setSearchQuery(s.name)
+                          setSuggestions([])
+                          setCurrentStep(Math.max(currentStep, 3))
+                        }}
+                        className="p-2 cursor-pointer hover:bg-amber-100"
+                      >
+                        {s.name}
+                      </li>
+                    ))}
+                  </ul>
                 )}
               </div>
             </div>

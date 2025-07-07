@@ -9,8 +9,12 @@ import {
   MapPin,
   Map,
   Heart,
-  CircleUserRound,
 } from 'lucide-react'
+import dynamic from 'next/dynamic'
+
+const MapWithClusters = dynamic(() => import('@/components/MapWithClusters'), {
+  ssr: false,
+})
 
 interface User {
   id: string
@@ -52,7 +56,6 @@ export default function ExplorePage() {
   const [communityRatings, setCommunityRatings] = useState<CommunityRating[]>(
     [],
   )
-  const [topUsers, setTopUsers] = useState<User[]>([])
   const [currentUser, setCurrentUser] = useState<any>(null)
 
   useEffect(() => {
@@ -99,13 +102,6 @@ export default function ExplorePage() {
     )
   }
 
-  const handleFollow = (userId: string) => {
-    setTopUsers((prev) =>
-      prev.map((user) =>
-        user.id === userId ? { ...user, isFollowing: !user.isFollowing } : user,
-      ),
-    )
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50">
@@ -278,60 +274,7 @@ export default function ExplorePage() {
           </div>
         )}
 
-        {activeTab === 'map' && (
-          <div className="space-y-4">
-            {topUsers.map((user) => (
-              <div
-                key={user.id}
-                className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    {user.avatar ? (
-                      <Image
-                        src={user.avatar}
-                        alt={user.name}
-                        width={50}
-                        height={50}
-                        className="w-12 h-12 rounded-full object-cover border-2 border-amber-200"
-                      />
-                    ) : (
-                      <span
-                        className="w-12 h-12 flex items-center justify-center border-2 border-amber-200 rounded-full"
-                        role="img"
-                        aria-label="No avatar"
-                      >
-                        <CircleUserRound className="w-6 h-6 text-amber-500" />
-                      </span>
-                    )}
-                    <div>
-                      <h3 className="font-semibold text-amber-900">
-                        {user.name}
-                      </h3>
-                      <div className="flex items-center gap-4 text-sm text-amber-600">
-                        <span>{user.stats.totalRatings} ratings</span>
-                        <div className="flex items-center gap-1">
-                          <Star className="w-3 h-3 text-amber-500 fill-current" />
-                          <span>{user.stats.averageRating}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => handleFollow(user.id)}
-                    className={`px-6 py-2 rounded-full font-medium transition-all duration-300 ${
-                      user.isFollowing
-                        ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                        : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 shadow-lg hover:shadow-xl'
-                    }`}
-                  >
-                    {user.isFollowing ? 'Following' : 'Follow'}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        {activeTab === 'map' && <MapWithClusters />}
       </div>
     </div>
   )

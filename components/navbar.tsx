@@ -153,7 +153,7 @@ export default function Navbar() {
                     <button
                       key={item.id}
                       onClick={item.onClick}
-                      className={`relative flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-300 min-w-0 flex-1 ${
+                      className={`relative flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-300 w-full flex-1 ${
                         item.isSpecial
                           ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg hover:shadow-xl hover:scale-105"
                           : item.isActive
@@ -170,9 +170,9 @@ export default function Navbar() {
                 }
 
                 return (
-                  <Link key={item.id} href={item.href || "/"}>
+                  <Link key={item.id} href={item.href || "/"} className="flex-1">
                     <button
-                      className={`relative flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-300 min-w-0 flex-1 ${
+                      className={`relative flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-300 w-full ${
                         item.isSpecial
                           ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg hover:shadow-xl hover:scale-105"
                           : item.isActive

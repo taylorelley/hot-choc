@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { MapPin, Calendar, Star, Share2, Heart } from "lucide-react"
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import Link from "next/link"
@@ -29,6 +29,7 @@ interface Rating {
 
 export default function RatingDetailPage() {
   const params = useParams()
+  const router = useRouter()
   const [rating, setRating] = useState<Rating | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isFavorite, setIsFavorite] = useState(false)
@@ -116,6 +117,24 @@ export default function RatingDetailPage() {
     chocolate: { label: "Chocolate Intensity", icon: "🍫", color: "from-amber-400 to-amber-800" },
     creaminess: { label: "Creaminess", icon: "🥛", color: "from-white to-amber-200" },
     presentation: { label: "Presentation", icon: "✨", color: "from-gray-300 to-purple-400" },
+  }
+
+  const handleDelete = () => {
+    if (!rating) return
+    if (!confirm('Delete this rating?')) return
+    try {
+      const raw = localStorage.getItem('hotChocRatings')
+      if (raw) {
+        const list = JSON.parse(raw)
+        if (Array.isArray(list)) {
+          const updated = list.filter((r: any) => r.id !== rating.id)
+          localStorage.setItem('hotChocRatings', JSON.stringify(updated))
+        }
+      }
+    } catch (err) {
+      console.error('Failed to delete rating', err)
+    }
+    router.push('/dashboard')
   }
 
   return (
@@ -294,6 +313,15 @@ export default function RatingDetailPage() {
               </div>
             </div>
           )}
+
+          <div className="text-center">
+            <button
+              onClick={handleDelete}
+              className="mt-6 bg-red-500 hover:bg-red-600 text-white py-3 px-6 rounded-xl font-medium transition-colors"
+            >
+              Delete Rating
+            </button>
+          </div>
         </div>
       </div>
     </div>

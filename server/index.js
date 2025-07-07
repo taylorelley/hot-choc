@@ -85,6 +85,19 @@ app.get('/api/ratings/:id', (req, res) => {
   res.json(rating);
 });
 
+app.delete('/api/ratings/:id', authMiddleware, (req, res) => {
+  console.log('Delete rating', req.params.id, 'by user', req.user.email);
+  const index = data.ratings.findIndex(r => r.id === req.params.id);
+  if (index === -1) return res.status(404).json({ message: 'Not found' });
+  const rating = data.ratings[index];
+  if (rating.userId && rating.userId !== req.user.id) {
+    return res.status(403).json({ message: 'Forbidden' });
+  }
+  data.ratings.splice(index, 1);
+  saveData();
+  res.json({ message: 'Deleted' });
+});
+
 // Generic error handler so stack traces appear in logs
 app.use((err, req, res, next) => {
   console.error('Unhandled error', err)

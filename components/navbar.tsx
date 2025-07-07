@@ -145,7 +145,7 @@ export default function Navbar() {
         <div className="max-w-md mx-auto">
           <div className="bg-white/80 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-2">
             <div
-              className="grid place-items-center"
+              className="grid"
               style={{ gridTemplateColumns: `repeat(${navItems.length}, minmax(0, 1fr))` }}
             >
               {navItems.map((item) => {

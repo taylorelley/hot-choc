@@ -5,7 +5,20 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
-import { Bell, Shield, Globe, Camera, Save, LogOut, Trash2, Eye, EyeOff, Mail, Lock } from "lucide-react"
+import {
+  Bell,
+  Shield,
+  Globe,
+  Camera,
+  Save,
+  LogOut,
+  Trash2,
+  Eye,
+  EyeOff,
+  Mail,
+  Lock,
+  CircleUserRound,
+} from "lucide-react"
 
 interface UserProfile {
   id: string
@@ -182,11 +195,11 @@ export default function SettingsPage() {
                     />
                   ) : (
                     <span
-                      className="w-24 h-24 flex items-center justify-center text-6xl border-4 border-amber-200 rounded-full"
+                      className="w-24 h-24 flex items-center justify-center border-4 border-amber-200 rounded-full"
                       role="img"
                       aria-label="No avatar"
                     >
-                      👤
+                      <CircleUserRound className="w-16 h-16 text-amber-500" />
                     </span>
                   )}
                   <button

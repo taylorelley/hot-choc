@@ -10,6 +10,7 @@ import {
   Users,
   TrendingUp,
   Heart,
+  CircleUserRound,
 } from 'lucide-react'
 
 interface User {
@@ -297,11 +298,11 @@ export default function ExplorePage() {
                       />
                     ) : (
                       <span
-                        className="w-12 h-12 flex items-center justify-center text-3xl border-2 border-amber-200 rounded-full"
+                        className="w-12 h-12 flex items-center justify-center border-2 border-amber-200 rounded-full"
                         role="img"
                         aria-label="No avatar"
                       >
-                        👤
+                        <CircleUserRound className="w-6 h-6 text-amber-500" />
                       </span>
                     )}
                     <div>

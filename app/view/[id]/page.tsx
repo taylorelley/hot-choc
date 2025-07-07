@@ -158,6 +158,12 @@ export default function RatingDetailPage() {
 
           <div className="flex gap-2">
             <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            >
+              <Trash2 className="w-5 h-5 text-red-600" />
+            </button>
+            <button
               onClick={() => setIsFavorite(!isFavorite)}
               className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
             >
@@ -167,12 +173,6 @@ export default function RatingDetailPage() {
             </button>
             <button className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
               <Share2 className="w-5 h-5 text-amber-700" />
-            </button>
-            <button
-              onClick={() => setShowDeleteConfirm(true)}
-              className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-            >
-              <Trash2 className="w-5 h-5 text-red-600" />
             </button>
           </div>
         </div>

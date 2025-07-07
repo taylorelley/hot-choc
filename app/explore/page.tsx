@@ -7,7 +7,7 @@ import {
   Filter,
   Star,
   MapPin,
-  Map,
+  Map as MapIcon,
   Heart,
   CircleUserRound,
 } from 'lucide-react'
@@ -238,7 +238,7 @@ export default function ExplorePage() {
                   : 'text-amber-700 hover:bg-amber-50'
               }`}
             >
-              <Map className="w-4 h-4" />
+              <MapIcon className="w-4 h-4" />
               <span className="font-medium">Map</span>
             </button>
           </div>

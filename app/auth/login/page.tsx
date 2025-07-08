@@ -3,6 +3,7 @@
 import type React from 'react'
 
 import { useState } from 'react'
+import { fetchUserRatings } from '../../../lib/api'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Eye, EyeOff, ArrowRight, Mail, Lock } from 'lucide-react'
@@ -10,8 +11,7 @@ import Image from 'next/image'
 
 export default function LoginPage() {
   const router = useRouter()
-  const API_URL =
-    process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -52,6 +52,16 @@ export default function LoginPage() {
           JSON.stringify({ email: formData.email }),
         )
       }
+
+      // refresh local ratings cache for this user
+      try {
+        const ratings = await fetchUserRatings(data.token)
+        localStorage.setItem('hotChocRatings', JSON.stringify(ratings))
+      } catch (err) {
+        console.error('Failed to fetch user ratings after login', err)
+        localStorage.removeItem('hotChocRatings')
+      }
+
       router.push('/dashboard')
     } catch (err: any) {
       console.error('Login failed', err)

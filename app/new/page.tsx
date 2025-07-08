@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Camera, MapPin, Save, Sparkles, Zap, CheckCircle } from 'lucide-react'
 import NextImage from 'next/image'
+import { createRating } from '../../lib/api'
 
 interface RatingData {
   temperature: number
@@ -217,23 +218,13 @@ export default function NewRatingPage() {
     // Simulate API call delay for better UX
     await new Promise((resolve) => setTimeout(resolve, 1500))
 
-    const currentUserRaw = localStorage.getItem('currentUser')
-    let userId: string | undefined
-    if (currentUserRaw) {
-      try {
-        const parsed = JSON.parse(currentUserRaw)
-        if (parsed && typeof parsed.id === 'string') {
-          userId = parsed.id
-        }
-      } catch (err) {
-        console.error('Failed to parse current user info', err)
-        errorMessage = 'Failed to read user information.'
-      }
+    const token = localStorage.getItem('token')
+    if (!token) {
+      alert('Please login first')
+      setIsSaving(false)
+      return
     }
-
     const newRating = {
-      id: crypto.randomUUID(),
-      userId,
       photo,
       location,
       ratings,
@@ -241,36 +232,22 @@ export default function NewRatingPage() {
       timestamp: new Date().toISOString(),
     }
 
-    let existingRatings: any[] = []
     try {
+      const saved = await createRating(token, newRating)
       const stored = localStorage.getItem('hotChocRatings')
+      let list: any[] = []
       if (stored) {
-        existingRatings = JSON.parse(stored)
-        if (!Array.isArray(existingRatings)) {
-          existingRatings = []
+        try {
+          const parsed = JSON.parse(stored)
+          if (Array.isArray(parsed)) list = parsed
+        } catch {
+          // ignore parse errors for corrupted cache
         }
       }
-    } catch (err) {
-      console.error('Failed to read ratings from localStorage', err)
-      errorMessage = 'Failed to read saved ratings.'
-      existingRatings = []
-    }
-
-    const updatedRatings = [newRating, ...existingRatings]
-
-    try {
-      localStorage.setItem('hotChocRatings', JSON.stringify(updatedRatings))
+      localStorage.setItem('hotChocRatings', JSON.stringify([saved, ...list]))
     } catch (err: any) {
       console.error('Failed to save rating', err)
-      if (
-        err?.name === 'QuotaExceededError' ||
-        err?.name === 'NS_ERROR_DOM_QUOTA_REACHED'
-      ) {
-        errorMessage =
-          'Storage limit reached. Please remove old ratings or use smaller photos.'
-      } else {
-        errorMessage = 'Failed to save rating.'
-      }
+      errorMessage = err.message || 'Failed to save rating.'
     }
 
     setIsSaving(false)

@@ -2,7 +2,8 @@
 
 This project contains a Next.js frontend for rating hot chocolate drinks. The original app stored all data in `localStorage`.
 
-A simple Express backend has been added under `server/` to provide a real API for user management and ratings. Data is persisted in a JSON file for demonstration purposes.
+A simple Express backend has been added under `server/` to provide a real API for user management and ratings. Data is persisted in a SQLite database so user accounts and ratings are shared across devices.
+Large photo uploads are supported by configuring the Express JSON body parser to accept payloads up to 10 MB.
 
 ## Running the frontend
 
@@ -28,8 +29,9 @@ The API listens on port `3001` by default and exposes the following endpoints:
 - `GET /api/ratings` – list all ratings
 - `POST /api/ratings` – create a rating (requires `Authorization: Bearer <token>`)
 - `GET /api/ratings/:id` – fetch a single rating
+- `GET /api/user/ratings` – list ratings created by the authenticated user
 
-This backend uses a simple JSON file for persistence. Replace it with a proper database for production.
+This backend uses a small SQLite database for persistence so ratings and users are available from any device.
 
 ## Running with Docker Compose
 
@@ -59,4 +61,3 @@ npm install
 npm test
 npm run format
 ```
-

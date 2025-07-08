@@ -240,7 +240,9 @@ export default function NewRatingPage() {
         try {
           const parsed = JSON.parse(stored)
           if (Array.isArray(parsed)) list = parsed
-        } catch {}
+        } catch {
+          // ignore parse errors for corrupted cache
+        }
       }
       localStorage.setItem('hotChocRatings', JSON.stringify([saved, ...list]))
     } catch (err: any) {

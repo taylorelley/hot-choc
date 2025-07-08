@@ -6,7 +6,7 @@ import { MapPin, Calendar, Star, Share2, Heart, Trash2 } from 'lucide-react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import Link from 'next/link'
 import Image from 'next/image'
-import { fetchRating, deleteRating } from '../../lib/api'
+import { fetchRating, deleteRating } from '../../../lib/api'
 
 interface Rating {
   id: string

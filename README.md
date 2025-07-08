@@ -28,6 +28,7 @@ The API listens on port `3001` by default and exposes the following endpoints:
 - `GET /api/ratings` – list all ratings
 - `POST /api/ratings` – create a rating (requires `Authorization: Bearer <token>`)
 - `GET /api/ratings/:id` – fetch a single rating
+- `GET /api/user/ratings` – list ratings created by the authenticated user
 
 This backend uses a small SQLite database for persistence so ratings and users are available from any device.
 

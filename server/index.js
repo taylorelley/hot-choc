@@ -81,6 +81,13 @@ app.get('/api/ratings', (req, res) => {
   res.json(rows.map((r) => JSON.parse(r.data)))
 })
 
+app.get('/api/user/ratings', authMiddleware, (req, res) => {
+  const rows = db
+    .prepare('SELECT data FROM ratings WHERE userId = ?')
+    .all(req.user.id)
+  res.json(rows.map((r) => JSON.parse(r.data)))
+})
+
 app.post('/api/ratings', authMiddleware, (req, res) => {
   const rating = { id: Date.now().toString(), userId: req.user.id, ...req.body }
   db.prepare('INSERT INTO ratings (id,userId,data) VALUES (?,?,?)').run(

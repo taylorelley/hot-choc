@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { fetchRatings } from '../../lib/api'
+import { fetchUserRatings } from '../../lib/api'
 import {
   Star,
   MapPin,
@@ -68,10 +68,16 @@ export default function DashboardPage() {
     const userData = JSON.parse(currentUser)
     setUser(userData)
 
-    fetchRatings()
+    const token = localStorage.getItem('token')
+    if (!token) {
+      router.push('/auth/login')
+      return
+    }
+
+    fetchUserRatings(token)
       .then((all) => {
         localStorage.setItem('hotChocRatings', JSON.stringify(all))
-        const userRatings = all.filter((r: Rating) => r.userId === userData.id)
+        const userRatings = all
         setRatings(userRatings)
 
         let updatedUser

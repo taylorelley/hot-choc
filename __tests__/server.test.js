@@ -60,4 +60,36 @@ describe('server api', () => {
     const list = await request(app).get('/api/ratings')
     expect(list.body.find((r) => r.id === ratingId)).toBeUndefined()
   })
+
+  test('user ratings endpoint', async () => {
+    const user1 = { name: 'A', email: 'a@example.com', password: 'pass' }
+    await request(app).post('/api/register').send(user1)
+    const login1 = await request(app)
+      .post('/api/login')
+      .send({ email: user1.email, password: user1.password })
+    const token1 = login1.body.token
+    await request(app)
+      .post('/api/ratings')
+      .set('Authorization', `Bearer ${token1}`)
+      .send({ location: { name: 'Cafe1' }, ratings: {}, notes: '' })
+
+    const user2 = { name: 'B', email: 'b@example.com', password: 'pass' }
+    await request(app).post('/api/register').send(user2)
+    const login2 = await request(app)
+      .post('/api/login')
+      .send({ email: user2.email, password: user2.password })
+    const token2 = login2.body.token
+
+    const list1 = await request(app)
+      .get('/api/user/ratings')
+      .set('Authorization', `Bearer ${token1}`)
+    expect(list1.body.length).toBe(1)
+    expect(list1.body[0].userId).toBe(login1.body.user.id)
+
+    const list2 = await request(app)
+      .get('/api/user/ratings')
+      .set('Authorization', `Bearer ${token2}`)
+    expect(Array.isArray(list2.body)).toBe(true)
+    expect(list2.body.length).toBe(0)
+  })
 })

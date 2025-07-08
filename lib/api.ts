@@ -6,6 +6,14 @@ export async function fetchRatings() {
   return res.json()
 }
 
+export async function fetchUserRatings(token: string) {
+  const res = await fetch(`${API_URL}/api/user/ratings`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!res.ok) throw new Error('Failed to fetch user ratings')
+  return res.json()
+}
+
 export async function fetchRating(id: string) {
   const res = await fetch(`${API_URL}/api/ratings/${id}`)
   if (!res.ok) throw new Error('Failed to fetch rating')

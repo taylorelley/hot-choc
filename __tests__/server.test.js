@@ -22,6 +22,13 @@ describe('server api', () => {
   test('register and login', async () => {
     const user = { name: 'Test', email: 'test@example.com', password: 'pass' }
     await request(app).post('/api/register').send(user).expect(200)
+    const Database = require('better-sqlite3')
+    const db = new Database(process.env.DB_FILE)
+    const stored = db
+      .prepare('SELECT * FROM users WHERE email = ?')
+      .get(user.email)
+    db.close()
+    expect(stored).toBeDefined()
     const res = await request(app)
       .post('/api/login')
       .send({ email: user.email, password: user.password })

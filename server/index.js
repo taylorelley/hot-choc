@@ -32,7 +32,7 @@ db.prepare(
 
 const app = express()
 app.use(cors())
-app.use(bodyParser.json())
+app.use(bodyParser.json({ limit: '10mb' }))
 app.use(morgan('combined'))
 
 function authMiddleware(req, res, next) {

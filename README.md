@@ -3,6 +3,7 @@
 This project contains a Next.js frontend for rating hot chocolate drinks. The original app stored all data in `localStorage`.
 
 A simple Express backend has been added under `server/` to provide a real API for user management and ratings. Data is persisted in a SQLite database so user accounts and ratings are shared across devices.
+Large photo uploads are supported by configuring the Express JSON body parser to accept payloads up to 10 MB.
 
 ## Running the frontend
 

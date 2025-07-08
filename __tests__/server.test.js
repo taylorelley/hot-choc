@@ -92,4 +92,25 @@ describe('server api', () => {
     expect(Array.isArray(list2.body)).toBe(true)
     expect(list2.body.length).toBe(0)
   })
+
+  test('handles large rating payloads', async () => {
+    const user = { name: 'Big', email: 'big@example.com', password: 'pass' }
+    await request(app).post('/api/register').send(user)
+    const login = await request(app)
+      .post('/api/login')
+      .send({ email: user.email, password: user.password })
+    const token = login.body.token
+    const bigPhoto = 'x'.repeat(200000) // ~200kb string
+    const res = await request(app)
+      .post('/api/ratings')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        photo: bigPhoto,
+        location: { name: 'Cafe' },
+        ratings: {},
+        notes: '',
+      })
+    expect(res.status).toBe(200)
+    expect(res.body.photo.length).toBe(bigPhoto.length)
+  })
 })

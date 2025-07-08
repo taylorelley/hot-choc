@@ -89,7 +89,7 @@ app.get('/api/user/ratings', authMiddleware, (req, res) => {
 })
 
 app.post('/api/ratings', authMiddleware, (req, res) => {
-  const rating = { id: Date.now().toString(), userId: req.user.id, ...req.body }
+  const rating = { id: Date.now().toString(), ...req.body, userId: req.user.id }
   db.prepare('INSERT INTO ratings (id,userId,data) VALUES (?,?,?)').run(
     rating.id,
     rating.userId,

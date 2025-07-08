@@ -93,6 +93,36 @@ describe('server api', () => {
     expect(list2.body.length).toBe(0)
   })
 
+  test('rating userId is enforced', async () => {
+    const user = { name: 'Owner', email: 'owner@example.com', password: 'pass' }
+    await request(app).post('/api/register').send(user)
+    const login = await request(app)
+      .post('/api/login')
+      .send({ email: user.email, password: user.password })
+    const token = login.body.token
+
+    const create = await request(app)
+      .post('/api/ratings')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        userId: 'hacker',
+        location: { name: 'Cafe' },
+        ratings: {},
+        notes: '',
+      })
+
+    expect(create.status).toBe(200)
+    expect(create.body.userId).toBe(login.body.user.id)
+
+    const Database = require('better-sqlite3')
+    const db = new Database(process.env.DB_FILE)
+    const row = db
+      .prepare('SELECT data FROM ratings WHERE id = ?')
+      .get(create.body.id)
+    db.close()
+    expect(JSON.parse(row.data).userId).toBe(login.body.user.id)
+  })
+
   test('handles large rating payloads', async () => {
     const user = { name: 'Big', email: 'big@example.com', password: 'pass' }
     await request(app).post('/api/register').send(user)
